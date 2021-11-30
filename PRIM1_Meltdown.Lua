@@ -6,7 +6,6 @@ by gloopyreverb
 
 
 -- Libraries
--- D
 local Event = game.ReplicatedStorage.NotificationCards.RemoteEvent;
 
 
@@ -345,9 +344,13 @@ for z = 408,0,-1 do
 	end
 	if z == 268 then
 		-- explosion on reactor window 1 and 2
+		debris("reactorwindow1/2")
+	end
+	if z == 267 then
+		replicatedstorage.GUIEvents.AddFacilityStatus:FireAllClients("Attention! Reactor window destroyed. Locking off further chamber access.",6)
 	end
 	if z == 252 then
-		-- reactor lasers catch on fire; module falls apart
+		
 	end
 	if z == 243 then
 		-- fire at cargo bay
@@ -373,9 +376,19 @@ for z = 408,0,-1 do
 		notify("Notify","Info","Shutdown Expired","The shutdown protocol has expired! All personell, you have 3 minutes to get to the bunker or Emergency Jets.",10)
 	end
 	if z == 205 then
-		-- reactor laser 2 module catches on fire; another module falls apart
+		audiosfx.ExplosionSoundEffects.Explosion:Play()
+		replicatedstorage.Events.WoopShocking:FireAllClients()		
+		unanchor2(core.Lasers.Model1)
+		unanchor2(core.Lasers.Model2)
+		unanchor2(core.Lasers.Model3)
+		local e = Instance.new("Explosion")
+		e.Parent = game.Workspace
+		e.Position = core.Lasers.Model1.Part.Position
+		e.BlastRadius = 20
+		e.BlastPressure = 40
+		e.ExplosionType = Enum.ExplosionType.NoCraters
 	end
-	if z == 200 then
+		if z == 200 then
 		audiosfx.PowerOn:Play()
 		power("On")
 		wait(0.2)
@@ -384,10 +397,9 @@ for z = 408,0,-1 do
 		wait(0.3)
 		audiosfx.PowerOn:Play()
 		power("Red")
-		--icy starts melting
 	end
 	if z == 180 then
-		-- controls to the reactor start malfunctioning, icy melts
+		debris("glitchscreen")
 	end
 	if z == 140 then
 		audiosfx.Alarms.IsoAlarm_CountFor140Only:Play()
@@ -404,13 +416,12 @@ for z = 408,0,-1 do
 		fade(self.GeneralMusic.Meltdown.MeltdownPartC,"In")
 	end
 	if z == 130 then
-		debris("screen_static")
+		debris("glitchscreen")
 		audiosfx.Alarms.KlaxonAlarm_CountdownStarted_or_Last130Sec:Play()
 	end
 	if z == 120 then
 		audiosfx.Alarms.NuclearSiren:Play()
 		audiosfx.Rumbling:Play()
-		-- reactor bridge collapses
 	end
 	if z == 109 then
 		audiosfx.ExplosionSoundEffects.BlewItOutFast:Play()
@@ -497,10 +508,11 @@ for z = 408,0,-1 do
 		audiosfx.Rumbling:Play()
 	end
 	if z == 12 then
-		-- all bridges to reactor collapses
+		debris("bridge_collapse")
 	end
 	if z == 5 then
-		-- everything shuts off
+		-- everything, everything shuts off
+		debris("AllDown")
 	end
 	if z == 3 then
 		audiosfx.ExplosionSoundEffects.Rumble:Play()
