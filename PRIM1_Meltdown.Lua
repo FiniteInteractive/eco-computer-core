@@ -5,6 +5,9 @@ by gloopyreverb
 ]]
 
 
+-- TODO 
+--Regeneration; debris and bunker handling
+
 -- Libraries
 local Event = game.ReplicatedStorage.NotificationCards.RemoteEvent;
 
@@ -23,7 +26,7 @@ TweenService = game:GetService("TweenService")
 
 
 local announcement_timepos = {
-	twomin = 80;
+	expired = 76;
 	starting = 0;	
 	startingend = 30;
 }
@@ -127,6 +130,8 @@ audiosfx.Announcements.MeltdownLines.Ended:Connect(function()
 end)
 
 -- Main
+-- intercom option off	
+replicatedstorage.Events.Intercom:Fire(false)
 core.lIGHT.NearMelt.Enabled = true
 core.lIGHT.Fire_Dust.Enabled = true
 replicatedstorage.Events.DisasterClient:FireAllClients(true)
@@ -289,6 +294,8 @@ for z = 408,0,-1 do
 		replicatedstorage.GUIEvents.AddFacilityStatus:FireAllClients("Attention! The turbines have now malfunctioned!!",6)
 	end
 	if z == 370 then
+		-- after this point, intercom options are now on for players
+		replicatedstorage.Events.Intercom:Fire(true)
 		debris("cave")
 		audiosfx.ExplosionSoundEffects.Explosion:Play()
 		audiosfx.PowerOn:Play()
@@ -371,7 +378,7 @@ for z = 408,0,-1 do
 		debris("screen_static")
 	end
 	if z == 215 then
-		audiosfx.Announcements.MeltdownLines.TimePosition = announcement_timepos.twomin
+		audiosfx.Announcements.MeltdownLines.TimePosition = announcement_timepos.expired
 		audiosfx.Announcements.MeltdownLines:Play()
 		notify("Notify","Info","Shutdown Expired","The shutdown protocol has expired! All personell, you have 3 minutes to get to the bunker or Emergency Jets.",10)
 	end
@@ -487,6 +494,17 @@ for z = 408,0,-1 do
 		power("Off")
 		replicatedstorage.Events.WoopShocking:FireAllClients()
 	end
+	if z == 34 then
+		unanchor2(core.Lasers.Model4)
+		unanchor2(core.Lasers.Model5)
+		unanchor2(core.Lasers.Model6)
+		local e = Instance.new("Explosion")
+		e.Parent = game.Workspace
+		e.Position = core.Lasers.Model4.Part.Position
+		e.BlastRadius = 20
+		e.BlastPressure = 40
+		e.ExplosionType = Enum.ExplosionType.NoCraters
+	end
 	if z == 30 then
 		audiosfx.Alarms.AlarmWootWootDuhh:Play()
 		notify("Notify","Info","Bunker","The bunker is now closing! If you haven't, launch all the remaining Emergency Jets if necessary!",10)
@@ -495,7 +513,7 @@ for z = 408,0,-1 do
 		audiosfx.Alarms.NuclearSiren:Play()
 	end
 	if z == 24 then
-		fade(self.GeneralMusic.Meltdown.Meltdown_Ending ,"In")
+		fade(self.GeneralMusic.Meltdown.Meltdown_Ending, "In")
 	end
 	if z == 18 then
 		audiosfx.Alarms.AmbienceAlarm:Stop()
@@ -521,3 +539,19 @@ for z = 408,0,-1 do
 end
 replicatedstorage.Events.TheCoreExplode:FireAllClients(true)
 replicatedstorage.Events.WeExploded:FireAllClients()
+self.GeneralMusic.Meltdown.Meltdown_Ending.Ended:Connect:function()
+	replicatedstorage.GUIEvents.FadeScreen:FireAllClients(Color3.fromRGB(0,0,0),3.25)
+	wait(2)
+	replicatedstorage.Events.EndingEvent:FireAllClients("Meltdown") 
+	-- this is the ending!!! during this make sure to regenerate the
+	-- whole thing and stuff
+	--	make a seperate model so people can explore the entire destruction
+	-- scene. people who
+	-- choose to explore the ruins will be invisible to other players
+	-- as they explore through em'. 
+	wait(20)
+	replicatedstorage.Events.Regen:Fire() -- note that regeneration is a 14 second process
+	-- players who were in the control room have a toggle that will be turned so 
+	-- they will lose some FourCoins (up to 150-200) until they reach 0 and Ores (for iron and ruby, up to 1-3 lost, for phantom 3-5). they will also be de-leveled
+end)
+script.Disabled = true
