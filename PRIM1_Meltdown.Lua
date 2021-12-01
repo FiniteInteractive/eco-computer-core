@@ -311,13 +311,9 @@ for z = 408,0,-1 do
 		shockwave()
 	end
 	if z == 320 then
-		--pipes are leaking; pipe leak at storage, main hallway ad such
+		--pipes are leaking; pipe leak at storage, main hallway and such
 		debris("pipe_breakmainhall")
 		debris("pipe_breakcargo")
-	end
-	if z == 310 then
-		--replicatedstorage.GUIEvents.AddFacilityStatus:FireAllClients("A full evacuation has been ordered!",3)
-		-- code not necessary
 	end
 	if z == 280 then
 		audiosfx.Alarms.NuclearSiren:Play()
@@ -350,17 +346,15 @@ for z = 408,0,-1 do
 		power("On")
 	end
 	if z == 268 then
-		-- explosion on reactor window 1 and 2
 		debris("reactorwindow1/2")
 	end
 	if z == 267 then
 		replicatedstorage.GUIEvents.AddFacilityStatus:FireAllClients("Attention! Reactor window destroyed. Locking off further chamber access.",6)
 	end
 	if z == 252 then
-		
+		debris("cargofire")
 	end
 	if z == 243 then
-		-- fire at cargo bay
 		notify("Notify","Info","Fire","Attention! Fire at Cargo Bay! Extingush fire on sight!",6)
 		workspace.FourCC.ReactorStats.FireAlarmEx.Value = true
 	end
