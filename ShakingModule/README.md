@@ -1,5 +1,5 @@
 # History
-This shaker module was used in Four Computer Core Version 4 (2019) to Version 7. (2021)
+This shaker module was used in Eco/Four Computer Core Version 4 (2019) to Version 7. (2021)
 # How to Use
 Replace sound with location of the Audio instance.
 # Where to put this
