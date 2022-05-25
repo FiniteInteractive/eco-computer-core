@@ -1,2 +1,2 @@
 # Eco Computer Core
-EVERYTHING!!!!!!!!!!!!!!!!!!!1
+Make your mark on the ever-evolving reactor and mining game.
