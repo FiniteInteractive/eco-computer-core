@@ -1,5 +1,5 @@
-local sound =  -- Replace nil with Roblox Audio Instance, whether be a child or parent
-local intensity = -- 0.001 is low, 0.007 is recommended, 0.1 is okay, 1 is too much
+local sound = nil -- Replace nil with Roblox Audio Instance, whether be a child or parent
+local intensity = 0 -- 0.001 is low, 0.007 is recommended, 0.1 is okay, 1 is too much
 
 game:GetService("RunService").RenderStepped:connect(function()
 	workspace.Camera.CFrame = workspace.Camera.CFrame * CFrame.Angles(0, 
