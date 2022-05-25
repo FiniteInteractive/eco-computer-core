@@ -21,7 +21,6 @@ local QuestsData = {
 
 -- i could find one or two ways to improve this basic code
 game.Players.PlayerAdded:Connect(function(player)
-	task.wait(9)
 	local leaderstats = player:WaitForChild("leaderstats",9)
 	local QuestsFolder = Instance.new("Folder")
 	QuestsFolder.Name = "Quests"
@@ -30,43 +29,43 @@ game.Players.PlayerAdded:Connect(function(player)
 	local IgnitionRctr2 = Instance.new("NumberValue")
 	IgnitionRctr2.Name = "IgnitionRctr2"
 	IgnitionRctr2.Parent = QuestsFolder
-	IgnitionRctr2.Value = ds1:GetAsync(player.UserId, QuestsData.IgnitionRectr2) or 0
+	IgnitionRctr2.Value = ds1:SetAsync(player.UserId, QuestsData.IgnitionRectr2) or 0
 	local Coins = Instance.new("NumberValue")
 	Coins.Name = "Coins"
 	Coins.Parent = QuestsFolder
-	Coins.Value = ds1:GetAsync(player.UserId, QuestsData.Coins) or 0
+	Coins.Value = ds1:SetAsync(player.UserId, QuestsData.Coins) or 0
 	local Vent = Instance.new("NumberValue")
 	Vent.Name = "Vent"
 	Vent.Parent = QuestsFolder
-	Vent.Value = ds1:GetAsync(player.UserId, QuestsData.Vent) or 0
+	Vent.Value = ds1:SetAsync(player.UserId, QuestsData.Vent) or 0
 	local FriendsJoin = Instance.new("NumberValue")
 	FriendsJoin.Name = "FriendsJoin"
 	FriendsJoin.Parent = QuestsFolder
-	FriendsJoin.Value = ds1:GetAsync(player.UserId, QuestsData.FriendsJoin) or 0
+	FriendsJoin.Value = ds1:SetAsync(player.UserId, QuestsData.FriendsJoin) or 0
 	local SecretMarket = Instance.new("NumberValue")
 	SecretMarket.Name = "SecretMarket"
 	SecretMarket.Parent = QuestsFolder
-	SecretMarket.Value = ds1:GetAsync(player.UserId, QuestsData.SecretMarket) or 0
+	SecretMarket.Value = ds1:SetAsync(player.UserId, QuestsData.SecretMarket) or 0
 	local WindMachine = Instance.new("NumberValue")
 	WindMachine.Name = "WindMachine"
 	WindMachine.Parent = QuestsFolder
-	WindMachine.Value = ds1:GetAsync(player.UserId, QuestsData.WindMachine) or 0
+	WindMachine.Value = ds1:SetAsync(player.UserId, QuestsData.WindMachine) or 0
 	local StartReactors = Instance.new("NumberValue")
 	StartReactors.Name = "StartReactors"
 	StartReactors.Parent = QuestsFolder
-	StartReactors.Value = ds1:GetAsync(player.UserId, QuestsData.StartReactors) or 0
+	StartReactors.Value = ds1:SetAsync(player.UserId, QuestsData.StartReactors) or 0
 	local ShutdownReactors = Instance.new("NumberValue")
 	ShutdownReactors.Name = "ShutdownReactors"
 	ShutdownReactors.Parent = QuestsFolder
-	ShutdownReactors.Value = ds1:GetAsync(player.UserId, QuestsData.ShutdownReactors) or 0
+	ShutdownReactors.Value = ds1:SetAsync(player.UserId, QuestsData.ShutdownReactors) or 0
 	local GetIntoMachineYuh = Instance.new("NumberValue")
 	GetIntoMachineYuh.Name = "GetIntoMachineYuh"
 	GetIntoMachineYuh.Parent = QuestsFolder
-	GetIntoMachineYuh.Value = ds1:GetAsync(player.UserId, QuestsData.GetIntoMachineYuh) or 0
+	GetIntoMachineYuh.Value = ds1:SetAsync(player.UserId, QuestsData.GetIntoMachineYuh) or 0
 	local Phantoms = Instance.new("NumberValue")
 	Phantoms.Name = "PhntmPickGet"
 	Phantoms.Parent = QuestsFolder
-	Phantoms.Value = ds1:GetAsync(player.UserId, QuestsData.PhntmPickGet) or 0
+	Phantoms.Value = ds1:SetAsync(player.UserId, QuestsData.PhntmPickGet) or 0
 	-- end --
 	local eco = leaderstats.Eco
 	for I=1,8 do
