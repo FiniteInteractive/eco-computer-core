@@ -1,5 +1,5 @@
 --[[
-Low Power
+Low Power Startup
 Eco Computer Core, Backend Script
 by gloopyreverb
 ]]

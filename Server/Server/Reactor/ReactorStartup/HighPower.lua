@@ -1,5 +1,5 @@
 --[[
-High Power
+High Power Startup
 Eco Computer Core, Backend Script
 by gloopyreverb
 ]]
