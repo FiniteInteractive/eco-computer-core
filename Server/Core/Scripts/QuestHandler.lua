@@ -85,7 +85,7 @@ local function onPlayerJoin(player)  -- Runs when players join
 			Title = "Get 100 Eco."
 			Text = tostring("Quest Completed. You have earned "..Reward.." Eco!")
 			Icon = ""
-			if Coins.Value == false  then
+			if Coins.Value == false or player[eco].Value <= 99 then
 				QuestModule.MonitorCurrency(player,100,Reward,{Title,Text,Icon})
 			elseif Coins.Value == true then
 				return "Is Already Done"
@@ -167,7 +167,7 @@ local function onPlayerJoin(player)  -- Runs when players join
 	end
 
 	-- first check
-	for _,v in pairs(player.Quests:GetChildren()) do
+	for _,v in pairs(player.Quests:GetDescendants()) do
 		if v:IsA("BoolValue") then
 			QuestData:SetAsync(player.UserId, v.Value)
 			if v.Value == true then
@@ -178,8 +178,8 @@ local function onPlayerJoin(player)  -- Runs when players join
 	end
 
 	-- continous check
-	player.Quests.Changed:Connect(function()
-		for _,v in pairs(player.Quests:GetChildren()) do
+	for _,v in pairs(player.Quests:GetDescendants()) do
+		v.Changed:Connect(function()
 			if v:IsA("BoolValue") then
 				QuestData:SetAsync(player.UserId, v.Value)
 				if v.Value == true then
@@ -187,8 +187,8 @@ local function onPlayerJoin(player)  -- Runs when players join
 					QuestEvent:FireClient(player,v.Name)
 				end
 			end
-		end
-	end)
+		end)
+	end
 end
 
 local function create_table(player)
