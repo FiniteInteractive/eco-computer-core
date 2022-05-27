@@ -166,18 +166,6 @@ local function onPlayerJoin(player)  -- Runs when players join
 		task.wait(0.05)
 	end
 
-	-- first check
-	for _,v in pairs(player.Quests:GetDescendants()) do
-		if v:IsA("BoolValue") then
-			QuestData:SetAsync(data, v.Value)
-			if v.Value == true then
-				QuestData:SetAsync(data, v.Value)
-				print(tostring(v).." may be done")
-				QuestEvent:FireClient(data, v.Name)
-			end
-		end
-	end
-
 	-- continous check
 	for _,v in pairs(player.Quests:GetDescendants()) do
 		v.Changed:Connect(function()
