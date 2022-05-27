@@ -918,18 +918,26 @@ end)
 ReplicatedStorage.RemotesEvents.GuiEvents.GotOreEvent.OnClientEvent:Connect(function(ore)
 	if ore == "Ruby" then
 		script.Parent.Parent.Hooray:Play()
+		script.Parent.CaveUIResearchUI.GotOre.Visble = true
+		script.Parent.CaveUIResearchUI.GotOre.Frame.TextLabel.Text = "You got a Ruby Ore!"
 		game:GetService("TweenService"):Create(script.Parent.Resources["*OreList"].Frame.Ruby, TweenInfo.new(0.5,Enum.EasingStyle.Linear), {BorderSizePixel = 8}):Play()
 		task.wait(5)
+		script.Parent.CaveUIResearchUI.GotOre.Visble = false
 		game:GetService("TweenService"):Create(script.Parent.Resources["*OreList"].Frame.Ruby, TweenInfo.new(0.5,Enum.EasingStyle.Linear), {BorderSizePixel = 0}):Play()
 	elseif ore == "Phantom" then
 		script.Parent.Parent.Hooray:Play()
+		script.Parent.CaveUIResearchUI.GotOre.Visble = true
+		script.Parent.CaveUIResearchUI.GotOre.Frame.TextLabel.Text = "You got a Phantom Ore!"
 		game:GetService("TweenService"):Create(script.Parent.Resources["*OreList"].Frame.Phantom, TweenInfo.new(0.5,Enum.EasingStyle.Linear), {BorderSizePixel = 8}):Play()
 		task.wait(5)
+		script.Parent.CaveUIResearchUI.GotOre.Visble = false
 		game:GetService("TweenService"):Create(script.Parent.Resources["*OreList"].Frame.Phantom, TweenInfo.new(0.5,Enum.EasingStyle.Linear), {BorderSizePixel = 0}):Play()
 	elseif ore == "Iron" then
 		script.Parent.Parent.Hooray:Play()
+		script.Parent.CaveUIResearchUI.GotOre.Frame.TextLabel.Text = "You got an Iron Ore!"
 		game:GetService("TweenService"):Create(script.Parent.Resources["*OreList"].Frame.Iron, TweenInfo.new(0.5,Enum.EasingStyle.Linear), {BorderSizePixel = 8}):Play()
 		task.wait(5)
+		script.Parent.CaveUIResearchUI.GotOre.Visble = false
 		game:GetService("TweenService"):Create(script.Parent.Resources["*OreList"].Frame.Iron, TweenInfo.new(0.5,Enum.EasingStyle.Linear), {BorderSizePixel = 0}):Play()
 	end
 end)
