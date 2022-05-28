@@ -91,9 +91,9 @@ if player:FindFirstChild("Level") == nil then
 	--player.Level:WaitForChild("Experience_Current",7)
 	--player.Level:WaitForChild("Experience_Max",7)
 	local successed, returnedData = xpcall(function()
-		player:WaitForChild("Level",7)
-		player.Level:WaitForChild("Experience_Current",7)
-		player.Level:WaitForChild("Experience_Max",7)
+		player:WaitForChild("Level",15)
+		player.Level:WaitForChild("Experience_Current",15)
+		player.Level:WaitForChild("Experience_Max",15)
 		level_notload = false
 		print("Level Data loaded.")
 	end, function() -- 1
@@ -1944,7 +1944,7 @@ ReplicatedStorage.RemotesEvents.GameEvents.PaycheckReminder.OnClientEvent:Connec
 	script.Parent.Parent.Hooray:Play()
 	script.Parent.Paycheck.Visible = true
 	script.Parent.Paycheck.Paycheck.Frame.RewardEco.Text = eco.." Eco"
-	script.Parent.Paycheck.Paycheck.Frame.RewardXp.Text = xp.." Eco"
+	script.Parent.Paycheck.Paycheck.Frame.RewardXp.Text = xp.." XP"
 	task.wait(5)
 	script.Parent.Paycheck.Visible = false
 end)
@@ -1981,6 +1981,12 @@ ReplicatedStorage.Events.EndingEvent.OnClientEvent:Connect(function(endingtype)
 		end
 	elseif endingtype == "Overload" then
 		return "ok"
+	end
+end)
+
+workspace.World.Objects.Characters.Gello.Head.Dialog.DialogChoiceSelected:Connect(function(player,choice)
+	if choice.Name == "HaveAnyFood" then
+		ReplicatedStorage.Events.GiveSteak:FireServer()
 	end
 end)
 

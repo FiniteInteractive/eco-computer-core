@@ -99,12 +99,14 @@ DrowningZone.localPlayerEntered:Connect(function(localPlayer)
 	task.wait(39)
 	script.Parent.Parent.LocalMusic.DrowningMusic.Warning:Play()
 	task.wait(19)
-	script.Parent.Parent.LocalMusic.DrowningMusic:Play()
 	if DrownCheck == true then
+	script.Parent.Parent.LocalMusic.DrowningMusic:Play()
+	script.Parent.Parent.LocalMusic.DrowningMusic.Warning:Stop()
 		script.Parent.Drowning.Visible = true
 		if DrownCheck == true then
 			localPlayer.Character.Humanoid.Health = 80
 		end
+		if DrownCheck == true then
 		script.Parent.Drowning.Countdown.Text = "5"
 		script.Parent.Drowning.CountdownBG.Text = "5"
 		task.wait(1.85)
@@ -116,10 +118,10 @@ DrowningZone.localPlayerEntered:Connect(function(localPlayer)
 		task.wait(0.05)
 		script.Parent.Drowning.Visible = false
 		task.wait(0.05)
-		script.Parent.Drowning.Visible = true
+			script.Parent.Drowning.Visible = true
+		end
 		if DrownCheck == true then
 			localPlayer.Character.Humanoid.Health = 50
-		end
 		script.Parent.Drowning.Countdown.Text = "4"
 		script.Parent.Drowning.CountdownBG.Text = "4"
 		task.wait(1.85)
@@ -131,10 +133,10 @@ DrowningZone.localPlayerEntered:Connect(function(localPlayer)
 		task.wait(0.05)
 		script.Parent.Drowning.Visible = false
 		task.wait(0.05)
-		script.Parent.Drowning.Visible = true
+			script.Parent.Drowning.Visible = true
+			end
 		if DrownCheck == true then
 			localPlayer.Character.Humanoid.Health = 30
-		end
 		script.Parent.Drowning.Countdown.Text = "3"
 		script.Parent.Drowning.CountdownBG.Text = "3"
 		task.wait(1.85)
@@ -146,10 +148,10 @@ DrowningZone.localPlayerEntered:Connect(function(localPlayer)
 		task.wait(0.05)
 		script.Parent.Drowning.Visible = false
 		task.wait(0.05)
-		script.Parent.Drowning.Visible = true
+			script.Parent.Drowning.Visible = true
+			end
 		if DrownCheck == true then
 			localPlayer.Character.Humanoid.Health = 20
-		end
 		script.Parent.Drowning.Countdown.Text = "2"
 		script.Parent.Drowning.CountdownBG.Text = "2"
 		task.wait(1.85)
@@ -160,10 +162,10 @@ DrowningZone.localPlayerEntered:Connect(function(localPlayer)
 		script.Parent.Drowning.Visible = true
 		task.wait(0.05)
 		script.Parent.Drowning.Visible = false
-		task.wait(0.05)
+			task.wait(0.05)
+			end
 		if DrownCheck == true then
 			localPlayer.Character.Humanoid.Health = 10
-		end
 		script.Parent.Drowning.Visible = true
 		script.Parent.Drowning.Countdown.Text = "1"
 		script.Parent.Drowning.CountdownBG.Text = "1"
@@ -175,10 +177,10 @@ DrowningZone.localPlayerEntered:Connect(function(localPlayer)
 		script.Parent.Drowning.Visible = true
 		script.Parent.Drowning.Countdown.Text = "1"
 		script.Parent.Drowning.CountdownBG.Text = "1"
-		task.wait(1.85)
+			task.wait(1.85)
+		end
 		if DrownCheck == true then
 			localPlayer.Character.Humanoid.Health = 5
-		end
 		script.Parent.Drowning.Countdown.Text = "0"
 		script.Parent.Drowning.CountdownBG.Text = "0"
 		task.wait(0.5)
@@ -189,22 +191,23 @@ DrowningZone.localPlayerEntered:Connect(function(localPlayer)
 		script.Parent.Drowning.CountdownBG.Text = ""
 		task.wait(0.5)
 		script.Parent.Drowning.CountdownBG.Text = "0"
-		task.wait(3)
+			task.wait(3)
+		end
 		if DrownCheck == true then
 			localPlayer.Character.Humanoid.Health = 0
-		end
 		task.wait(2)
 		DrownCheck = false
-		script.Parent.Drowning.Visible = false
+			script.Parent.Drowning.Visible = false
+		end
 	end
 end)
 
 
 DrowningZone.localPlayerExited:Connect(function(localPlayer)
 	DrownCheck = false
-	script.Parent.Parent.LocalMusic.DrowningMusic.Warning:Stop()
 	game.SoundService.SongsCanMute.Volume = 1.985
 	script.Parent.Parent.LocalMusic.DrowningMusic:Stop()
+	script.Parent.Parent.LocalMusic.DrowningMusic.Warning:Stop()
 	script.Parent.Drowning.Visible = false
 end)
 
@@ -817,4 +820,3 @@ script.Parent.MeltdownOrOtherState.Changed:Connect(function(bool)
 
 	end
 end)
-

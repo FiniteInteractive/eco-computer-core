@@ -165,15 +165,11 @@ local function onPlayerJoin(player)  -- Runs when players join
 		clone.Parent = player.PlayerGui:WaitForChild("CoreGUI",6).Quests.QuestUI.QuestMenu.QuestsList
 		task.wait(0.05)
 	end
-
 	-- continous check
 	for _,v in pairs(player.Quests:GetDescendants()) do
 		v.Changed:Connect(function()
 			if v:IsA("BoolValue") then
-				QuestData:SetAsync(data, v.Value)
-				if v.Value == true then
-					QuestData:SetAsync(data, v.Value)
-					print(tostring(v).." may be done")					
+				if v.Value == true then				
 					QuestEvent:FireClient(data,v.Name)
 				end
 			end
@@ -183,7 +179,7 @@ end
 
 local function create_table(player)
 	local player_stats = {}
-	for _, stat in pairs(player.leaderstats:GetChildren()) do
+	for _, stat in pairs(player.Quests:GetChildren()) do
 		player_stats[stat.Name] = stat.Value
 	end
 	return player_stats
