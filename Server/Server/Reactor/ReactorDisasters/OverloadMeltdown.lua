@@ -161,7 +161,7 @@ function unexpected()
 	audiosfx.Alarms.Overload.BellAlarm:Play()
 	audiosfx.ExplosionSoundEffects.Explosion:Play()
 	replicatedstorage.Events.General.WoopShocking:FireAllClients()
-		
+
 	replicatedstorage.Events.General.WoopShocking:FireAllClients()
 
 	unanchor2(core.SpinnerReactorForm1)
@@ -223,23 +223,33 @@ fade(self.GeneralMusic.PlanetEradication.OverloadMeltdownPartA,"In")
 task.wait(3)
 audiosfx.Alarms.Overload.RepeatingWRREEE:Play()
 self.PowerRed:Fire()
+importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.NearMeltdownAlarm:Play()
 notify("Error","Failed to revert problem!",5)
 task.wait(2)
 audiosfx.Alarms.IsoAlarm_CountFor140Only:Play()
+ReplicatedStorage.RemotesEvents.GuiEvents.AddFacilityStatus:FireAllClients("Attention! 'Overload' Meltdown is imminent! More than 13,000km (8,000mi+) will be eradicated from this area, and Earth will experience a severe nuclear fallout!",7)
 importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.ScreenStartupModeChooser.SurfaceGui.Idle_Or_ImportantInstruction.overload_meltdown.Visible = true
 notify("Warning","An overload meltdown has been issued",8)
+audiosfx.Alarms.MeltdownDramatic.Alarm3:Play()
+audiosfx.Alarms.MeltdownDramatic.Alarm1:Play()
+audiosfx.Alarms.UrgentAlarm:Play()
+audiosfx.Alarms.UrgentWarning:Play()
 audiosfx.Announcements.OverloadMeltdown:Play()
 importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.SurfaceGui.Enabled = false
 importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.Countdown.Enabled = true
-task.wait(4)
+task.wait(6)
 notify("Evacuation Options","Please use the Space Travel or Emergency Jets option at this time! The bunker is not safe!",7)
 task.wait(2)
-ReplicatedStorage.RemotesEvents.GuiEvents.Captions:FireAllClients("[Alarms blaring]",9)
+ReplicatedStorage.RemotesEvents.GuiEvents.Captions:FireAllClients("[Alarms blaring]",40)
 ReplicatedStorage.RemotesEvents.GuiEvents.OtherUiController:FireAllClients("Countdown",true)
 replicatedstorage.Events.General.ContinousShake:FireAllClients()
 for z = 330,0,-1 do
 	ReplicatedStorage.RemotesEvents.GuiEvents.CountdownText:FireAllClients(z)
 	importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.Countdown.Frame.CountdownText.Text = "T-MINUS "..z.." SECONDS"
+	if z == 300 then
+		audiosfx.ExplosionSoundEffects.BlewItOut:Play()
+		replicatedstorage.Events.General.WoopShocking:FireAllClients()
+	end
 	if z == 280 then
 		audiosfx.ExplosionSoundEffects.Explosion:Play()
 		replicatedstorage.Events.General.WoopShocking:FireAllClients()
@@ -258,15 +268,24 @@ for z = 330,0,-1 do
 		fade(self.SFX.Alarms.AlarmBlur,"Out")
 	end
 	if z == 210 then
+		audiosfx.Alarms.Overload.facaalarm:Play()
 		unanchor2(workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.PrimaryChamber.ThermalUnits.THERMAL_U_A)
 		replicatedstorage.Events.General.WoopShocking:FireAllClients()
 		audiosfx.ExplosionSoundEffects.BlewItOut:Play()
 		audiosfx.ExplosionSoundEffects.SparkExp:Play()
 	end
+	if z == 190 then
+		audiosfx.ExplosionSoundEffects.BlewItOut:Play()
+		replicatedstorage.Events.General.WoopShocking:FireAllClients()
+	end
+	if z == 169 then
+		audiosfx.Alarms.MeltdownDramatic.Alarm3:Stop()
+	end
 	if z == 165 then
 		notify("Evacuation Options","Space Travel is an option if you are trying to evacuate!",7)
 	end
-	if z == 151 then
+	if z == 186 then
+		importantfacilityarea.PrimaryReactorArea.PrimaryChamber.ThatsChamberDebris.debris.Enabled = true
 		audiosfx.ExplosionSoundEffects.majorExplosion:Play()
 		audiosfx.ExplosionSoundEffects.SparkExp:Play()
 		audiosfx.ExplosionSoundEffects.ExplosionIdk:Play()
@@ -297,6 +316,20 @@ for z = 330,0,-1 do
 		audiosfx.ExplosionSoundEffects.SparkExp:Play()
 		audiosfx.ExplosionSoundEffects.ExplosionIdk:Play()
 	end
+	if z == 150 then
+		fade(self.SFX.OccasionalMeltdownAmbience,"In")
+	end
+	if z == 148 then
+		notify("Safety Warning","GET TO SAFETY IMMEDIATELY!",7)
+		importantfacilityarea.PrimaryReactorArea.PrimaryChamber.ThatsChamberDebris.debris.Enabled = true
+	end
+	if z == 142 then
+		audiosfx.ExplosionSoundEffects.BlewItOut:Play()
+		replicatedstorage.Events.General.WoopShocking:FireAllClients()	
+	end
+	if z == 134 then
+		audiosfx.Alarms.Overload.ExtrAlarm:Play()
+	end
 	if z == 127 then
 		power("off")
 		game.Lighting.Ambient = Color3.fromRGB(10,10,10)
@@ -310,6 +343,10 @@ for z = 330,0,-1 do
 		audiosfx.ExplosionSoundEffects.BlewItOut:Play()
 		game.ServerStorage.Misc.RegenModules.debris_roof_ctrl:Clone().Parent = workspace.World.Objects.Facility.Debris
 	end
+	if z == 80 then
+		audiosfx.ExplosionSoundEffects.BlewItOut:Play()
+		replicatedstorage.Events.General.WoopShocking:FireAllClients()
+	end
 	if z == 72 then
 		core.lIGHT.RS2.Volume = 4
 		core.lIGHT.RS2:Play()
@@ -321,7 +358,7 @@ for z = 330,0,-1 do
 	if z == 69 then
 		TweenService:Create(core.lIGHT.RS2.PitchShiftSoundEffect,TweenInfo.new(21),{Octave = 2}):Play()
 	end
-	if z == 65 then
+	if z == 66 then
 		self.GeneralMusic.PlanetEradication.OverloadMeltdownPartB:Play()
 		ReplicatedStorage.RemotesEvents.GuiEvents.Captions:FireAllClients("[Explosion]",7)
 		audiosfx.ExplosionSoundEffects.BlewItOutFast:Play()
@@ -345,7 +382,8 @@ for z = 330,0,-1 do
 		wait(1)
 		unanchor2(workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.ControlRoom.StairsGonExplode)
 	end
-	if z == 62 then
+	if z == 61 then
+		audiosfx.Alarms.Overload.ExtrAlarm:Stop()
 		audiosfx.OverloadCounting:Play()
 	end
 	if z == 60 then
@@ -354,15 +392,27 @@ for z = 330,0,-1 do
 		audiosfx.Overload60:Play()
 		workspace.LockdownItsLockingIndicator.Alarm:Play()
 	end
-	if z == 45 then
-		workspace.LockdownItsLockingIndicator.Alarm:Stop()
+	if z == 51 then
 		unanchor2(workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.PrimaryChamber.ThermalUnits.THERMAL_U_B)
 		replicatedstorage.Events.General.WoopShocking:FireAllClients()
-
 		audiosfx.ExplosionSoundEffects.BlewItOut:Play()
 		audiosfx.ExplosionSoundEffects.SparkExp:Play()
 	end
+	if z == 45 then
+		workspace.LockdownItsLockingIndicator.Alarm:Stop()
+		replicatedstorage.Events.General.WoopShocking:FireAllClients()
+		unanchor2(core.Lasers)
+		audiosfx.ExplosionSoundEffects.ElectronicExplosion:Play()
+		audiosfx.ExplosionSoundEffects.BlewItOut:Play()
+		audiosfx.ExplosionSoundEffects.SparkExp:Play()
+		BlackLights()
+	end
+	if z == 35 then
+		audiosfx.ExplosionSoundEffects.BlewItOut:Play()
+		replicatedstorage.Events.General.WoopShocking:FireAllClients()
+	end
 	if z == 30 then
+		audiosfx.Alarms.MeltdownDramatic.Alarm5:Play()
 		workspace.Graviity = 185
 		audiosfx.Overloadlast60:Play()
 	end
@@ -370,13 +420,28 @@ for z = 330,0,-1 do
 		TweenService:Create(core.lIGHT.Idle,TweenInfo.new(20),{PlaybackSpeed = 20}):Play()
 	end
 	if z == 11 then
-		BlackLights()
 		importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.Countdown.Frame.Visible = false
 		importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.Countdown.ded.Visible = true
 		fade(self.GeneralMusic.PlanetEradication.OverloadMeltdownPartA,"Out")
 		fade(self.GeneralMusic.PlanetEradication.Ending,"In")
 	end
+	if z == 6 then
+		importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.Countdown.Enabled = false
+		importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.SurfaceGui.Enabled = false
+		importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.Meltdown.Enabled = false
+		audiosfx.ExplosionSoundEffects.Explosion:Play()
+		importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.Anchored = false
+		task.wait(0.02)
+		unanchor2(importantfacilityarea.PrimaryReactorArea.ControlRoom.PrimMonitorCStat)
+		local e = Instance.new("Explosion")
+		e.Parent = game.Workspace
+		e.Position = importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.Positition
+		e.BlastRadius = 15
+		e.BlastPressure = 35
+		e.ExplosionType = Enum.ExplosionType.NoCraters
+	end
 	if z == 3 then
+		audiosfx.Alarms.MeltdownDramatic.Alarm5:Stop()
 		audiosfx.Alarms.Overload.Last100:Stop()
 		audiosfx.Alarms.AmbienceAlarm:Stop()
 		audiosfx.Overloadlast60:Stop()
@@ -395,6 +460,7 @@ for z = 330,0,-1 do
 	end
 	task.wait(1)
 end
+audiosfx.ExplosionSoundEffects.Rumble:Play()
 ReplicatedStorage.RemotesEvents.GuiEvents.OtherUiController:FireAllClients("Countdown",false)
 task.wait(3)
 audiosfx.OverloadExp:Play()
@@ -411,8 +477,8 @@ replicatedstorage.Events.Nuclear.FlingPlayersShockwave:Fire()
 task.wait(15)
 for _,Player in pairs(game.Players:GetPlayers()) do
 	if Player.Character then
-	local fire = Instance.new("Fire",Player.Character.HumanoidRootPart)
-	fire.Size = 20
+		local fire = Instance.new("Fire",Player.Character.HumanoidRootPart)
+		fire.Size = 20
 		fire.Enabled = true
 	end
 end

@@ -22,6 +22,7 @@ TweenService = game:GetService("TweenService")
 boom_module = require(game.ServerStorage.Modules.Reactor.BoomModule)
 local Jets = workspace.World.Objects.Facility.Jets.jetButtons
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CollectionService = game:GetService("CollectionService")
 
 
 --[[
@@ -150,7 +151,7 @@ function debris(area)
 		game.ServerStorage.Misc.Wall:Clone().Parent = workspace.World.Objects.Facility.Debris
 	elseif area == "ControlRoom_Roof" then
 		importantfacilityarea.PrimaryReactorArea.ControlRoom.Roof_control.debris.Enabled = true
-		wait(1.5)
+		task.wait(5.5)
 		importantfacilityarea.PrimaryReactorArea.ControlRoom.Roof_control.debris.Enabled = false
 	elseif area == "AllDown" then
 		importantfacilityarea.PrimaryReactorArea.ControlRoom.EvacSigns.EmergencyMode.Disabled = true
@@ -224,6 +225,9 @@ end
 -- Main
 -- intercom option off	
 if self.ReactorStats.ShutD.Value == false then
+	CollectionService:RemoveTag(workspace.World.NPCs.WanderAreas.ParkWanderArea, "pathfindable")
+	CollectionService:RemoveTag(workspace.World.NPCs.WanderAreas.FacilityEntranceWanderArea, "pathfindable")
+	CollectionService:RemoveTag(workspace.World.NPCs.WanderAreas.ParkingLotWanderArea, "pathfindable")
 	workspace.GameData.EcoCC.ReactorStats.NewPlayerState.Value = true
 	self.ReactorStats.IsDisaster.Value = true
 	task.wait(3)
@@ -291,9 +295,11 @@ if self.ReactorStats.ShutD.Value == false then
 	wait(19.2)
 	audiosfx.ExplosionSoundEffects.majorExplosion:Play()
 	audiosfx.Rumbling:Play()
+	notify("Shield Broken","Primary Reactor Shield BROKEN!",6)
 	ReplicatedStorage.RemotesEvents.GuiEvents.OtherUiController:FireAllClients("MeltdownHappening")
 	ReplicatedStorage.RemotesEvents.GameEvents.Nuclear.Nuke:Fire("ShieldBroken")
-
+	audiosfx.ExplosionSoundEffects.ShieldFail.Explo1:Play()
+	audiosfx.ExplosionSoundEffects.ShieldFail.Explo2:Play()
 	TweenService:Create(game.Lighting.client, TweenInfo.new(0.01), {Brightness = 0.85}):Play()
 	audiosfx.ExplosionSoundEffects.SparkExp:Play()
 	replicatedstorage.Events.General.WoopShocking:FireAllClients()
@@ -331,6 +337,7 @@ if self.ReactorStats.ShutD.Value == false then
 	workspace.World.Objects.Miscellaneous["old.Workspace"].OreExperimentBillboard.OvrLoadSuggestion.Enabled = true
 	replicatedstorage.Events.General.WoopShocking:FireAllClients()
 	audiosfx.ExplosionSoundEffects.ExplosionIdk:Play()
+	self.SFX.Alarms.MeltdownDramatic.Alarm1:Play()
 	importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.Status.Enabled = false
 	importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.Meltdown.Enabled = true
 	task.wait(5)
@@ -367,7 +374,6 @@ if self.ReactorStats.ShutD.Value == false then
 	wait(2.3)
 	debris("ControlRoom_Roof")
 	replicatedstorage.Events.General.WoopShocking:FireAllClients()
-
 	audiosfx.ExplosionSoundEffects.MajorCollapse:Play()
 	audiosfx.OutNoPow3:Play()
 	power("Red")
@@ -377,7 +383,7 @@ if self.ReactorStats.ShutD.Value == false then
 	wait(0.3)
 	audiosfx.Alarms.AmbienceAlarm2:Play()
 	replicatedstorage.Events.General.WoopShocking:FireAllClients()
-
+	fade(self.SFX.Alarms.MeltdownDramatic.Alarm1,"Out")
 	audiosfx.ExplosionSoundEffects.BlewItOut:Play()
 	notify("Detonation","The facility is estimated to detonate in 7 minutes.",6)
 	wait(5)
@@ -395,21 +401,25 @@ if self.ReactorStats.ShutD.Value == false then
 	wait(40)
 	audiosfx.Alarms.MeltdownDramatic.Alarm2:Play()
 	replicatedstorage.Events.General.WoopShocking:FireAllClients()
-
 	audiosfx.ExplosionSoundEffects.BlewItOut:Play()
 	game.ServerStorage.Misc.RegenModules.debris_roof_ctrl:Clone().Parent = workspace.World.Objects.Facility.Debris
 	wait(25)
 	importantfacilityarea.PrimaryReactorArea.ControlRoom.Bunker.BillboardGui.Enabled = true
 	shockwave()
-	wait(7)
+	task.wait(10)
 	local ma = math.random(1,2)
 	if ma == 2 then
 		if workspace.World.Keys:FindFirstChild("Key") == nil then
 			replicatedstorage.Components.Tools.Key:Clone().Parent = workspace.World.Keys
 		end
 	end
+	task.wait(5)
+	notify("Detonation","An estimated detonation countdown timer will now start. Evacuate now!",6)
 	audiosfx.Alarms.KlaxonAlarm_CountdownStarted_or_Last130Sec:Play()
-	wait(10)
+	audiosfx.Alarms.MeltdownDramatic.Alarm4:Play()
+	task.wait(4.95)
+	fade(audiosfx.Alarms.MeltdownDramatic.Alarm4,"Out")
+	task.wait(4.8)
 	ReplicatedStorage.RemotesEvents.GuiEvents.Captions:FireAllClients("[Alarms blaring]",9)
 	ReplicatedStorage.RemotesEvents.GuiEvents.OtherUiController:FireAllClients("Countdown",true)
 	for z = 408,0,-1 do
@@ -451,18 +461,21 @@ if self.ReactorStats.ShutD.Value == false then
 		if z == 340 then
 			shockwave()
 			ReplicatedStorage.RemotesEvents.GuiEvents.Captions:FireAllClients("[Shockwave]",5)
-		end
-		if z == 330 then
 			ReplicatedStorage.RemotesEvents.GuiEvents.Captions:FireAllClients("'Half Life Alyx: Credits' plays",12)
 			self.GeneralMusic.Meltdown.MeltdownPartB:Play()
 		end
 		if z == 320 then
+			importantfacilityarea.PrimaryReactorArea.PrimaryChamber.ThatsChamberDebris.debris.Enabled = true
 			audiosfx.Alarms.AmbienceAlarm2:Play()
 			workspace.World.Objects.Miscellaneous["old.Workspace"].OreExperimentBillboard.OvrLoadSuggestion.Enabled = false
 			debris("pipe_breakmainhall")
 			debris("pipe_breakcargo")
 		end
+		if z == 300 then
+			importantfacilityarea.PrimaryReactorArea.PrimaryChamber.ThatsChamberDebris.debris.Enabled = false
+		end
 		if z == 280 then
+			importantfacilityarea.PrimaryReactorArea.ControlRoom.Roof_control.debris.Enabled = true
 			ReplicatedStorage.RemotesEvents.GuiEvents.Captions:FireAllClients("[Major explosion]",7)
 			replicatedstorage.Events.General.WoopShocking:FireAllClients()
 			audiosfx.Alarms.NuclearSiren:Play()
@@ -477,6 +490,7 @@ if self.ReactorStats.ShutD.Value == false then
 			e.ExplosionType = Enum.ExplosionType.NoCraters
 		end
 		if z == 271 then
+			importantfacilityarea.PrimaryReactorArea.ControlRoom.Roof_control.debris.Enabled = false
 			ReplicatedStorage.RemotesEvents.GuiEvents.Captions:FireAllClients("[Sparking]",7)
 			ReplicatedStorage.RemotesEvents.GuiEvents.AddFacilityStatus:FireAllClients("30,000 megawatts of power has been transferred to the evacuation bunker.",6)
 		end
@@ -527,6 +541,7 @@ if self.ReactorStats.ShutD.Value == false then
 			debris("screen_static")
 		end
 		if z == 215 then
+			importantfacilityarea.PrimaryReactorArea.ControlRoom.Roof_control.debris.Enabled = true
 			self.ReactorStats.IsShutdownAvailable.Value = false
 			self.ReactorStats.ShutdownProbability.Value = 0
 			facility.ImportantFacilityAreas.PrimaryReactorArea.ControlRoom.Shutdown.ShutdownScreen.SurfaceGui.Title.Visible = false
@@ -538,7 +553,11 @@ if self.ReactorStats.ShutD.Value == false then
 			audiosfx.Announcements.MeltdownLines:Play()
 			notify("Shutdown Expired","The shutdown sequence has expired. All personell, please evacuate to the Emergency Bunker or Outside. You have 3 minutes!",8)
 		end
+		if z == 210 then
+			importantfacilityarea.PrimaryReactorArea.ControlRoom.Roof_control.debris.Enabled = false
+		end
 		if z == 205 then
+			importantfacilityarea.PrimaryReactorArea.ControlRoom.Roof_control.debris.Enabled = true
 			audiosfx.ExplosionSoundEffects.Explosion:Play()
 			replicatedstorage.Events.General.WoopShocking:FireAllClients()
 
@@ -596,6 +615,7 @@ if self.ReactorStats.ShutD.Value == false then
 		end
 		if z == 109 then
 			self.PowerEventChamber:Fire("red")
+			importantfacilityarea.PrimaryReactorArea.ControlRoom.Roof_control.debris.Enabled = true
 			ReplicatedStorage.RemotesEvents.GuiEvents.Captions:FireAllClients("[Explosion]",7)
 			audiosfx.ExplosionSoundEffects.BlewItOutFast:Play()
 			audiosfx.ExplosionSoundEffects.Explosion:Play()
@@ -619,16 +639,17 @@ if self.ReactorStats.ShutD.Value == false then
 			unanchor2(workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.ControlRoom.StairsGonExplode)
 		end
 		if z == 90 then
+			importantfacilityarea.PrimaryReactorArea.ControlRoom.Roof_control.debris.Enabled = false
 			workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.ControlRoom.VentLeak.leak.Enabled = true
 			workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.ControlRoom.VentLeak.Leak:Play()
 		end
+		if z == 89 then
+			audiosfx.ExplosionSoundEffects.Rumble:Play()
+		end
 		if z == 88 then
-			audiosfx.PowerOn:Play()
-			power("On")
-			task.wait(0.2)
 			audiosfx.OutNoPow3:Play()
 			power("Off")
-			task.wait(0.3)
+			task.wait(0.5)
 			audiosfx.PowerOn:Play()
 			power("Red")
 		end
@@ -654,6 +675,10 @@ if self.ReactorStats.ShutD.Value == false then
 			audiosfx.Rumbling:Play()
 			audiosfx.ExplosionSoundEffects.SparkExp:Play()
 			audiosfx.ExplosionSoundEffects.ExplosionIdk:Play()
+		end
+		if z == 61 then
+			audiosfx.ExplosionSoundEffects.BlewItOut:Play()
+			replicatedstorage.Events.General.WoopShocking:FireAllClients()
 		end
 		if z == 40 then
 			TweenService:Create(workspace.World.Objects.Miscellaneous.LockdownDoorCtrl.Main, TweenInfo.new(20, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {CFrame = workspace.World.Objects.Miscellaneous.LockdownDoorCtrl.Close.CFrame}):Play()
@@ -688,6 +713,7 @@ if self.ReactorStats.ShutD.Value == false then
 			e.ExplosionType = Enum.ExplosionType.NoCraters
 		end
 		if z == 30 then
+			audiosfx.Alarms.MeltdownDramatic.Alarm3:Play()
 			workspace.LockdownItsLockingIndicator.Alarm:Stop()
 			fade(self.SFX.OccasionalMeltdownAmbience,"Out")
 			ReplicatedStorage.RemotesEvents.GameEvents.Bunker:Fire("Close")
@@ -696,15 +722,18 @@ if self.ReactorStats.ShutD.Value == false then
 			notify("Bunker","The bunker is now closing!",8)
 		end
 		if z == 25 then
+			importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.NearMeltdownAlarm:Play()
 			audiosfx.Alarms.NuclearSiren:Play()
 			ReplicatedStorage.RemotesEvents.GuiEvents.Captions:FireAllClients("'The Final Countdown Remix' plays",6)
 			fade(self.GeneralMusic.Meltdown.Meltdown_Ending, "In")
+		end
+		if z == 20 then
+			fade(audiosfx.Alarms.MeltdownDramatic.Alarm3, "Out")
 		end
 		if z == 18 then
 			audiosfx.Alarms.AmbienceAlarm:Stop()
 			audiosfx.Alarms.MeltdownDramatic.Alarm1:Stop()
 			audiosfx.Alarms.MeltdownDramatic.Alarm2:Stop()
-			audiosfx.Alarms.MeltdownDramatic.Alarm3:Stop()
 			audiosfx.Alarms.AmbienceAlarm2:Stop()
 			audiosfx.Alarms.IsoAlarm_CountFor140Only:Stop()
 			audiosfx.Alarms.RepeatingWRREEE:Stop()
@@ -718,6 +747,8 @@ if self.ReactorStats.ShutD.Value == false then
 			self.PowerEventChamber:Fire("off")
 		end
 		if z == 3 then
+			importantfacilityarea.PrimaryReactorArea.ControlRoom.Roof_control.debris.Enabled = true
+			importantfacilityarea.PrimaryReactorArea.PrimaryChamber.ThatsChamberDebris.debris.Enabled = true
 			audiosfx.ExplosionSoundEffects.Rumble:Play()
 		end
 		task.wait(1)
