@@ -2,11 +2,8 @@
 Shutdown System
 Eco Computer Core Backend Script
 by gloopyreverb
+08/02/21
 ]]
-
-
--- TODO 
---Regeneration; debris and bunker handling
 
 -- Libraries
 
@@ -150,7 +147,7 @@ function shutdown()
 	game:GetService("TweenService"):Create(core.CoreL.Part3,TweenInfo.new(5),{Color = Color3.fromRGB(0,0,0)}):Play()
 	game:GetService("TweenService"):Create(core.CoreL.Part4,TweenInfo.new(5),{Color = Color3.fromRGB(0,0,0)}):Play()
 	task.wait(3)
-	local CoreL = core.Core.Reactor1Primary
+	local CoreL = core
 	for i = 1,10 do
 		TweenService:Create(CoreL["Startup"..i], TweenInfo.new(0.5), {Color = Color3.fromRGB(0, 0, 0)}):Play()
 	end
@@ -182,6 +179,7 @@ function shutdown()
 	task.wait(2)
 	core.lIGHT.Fire_Dust.Enabled = false
 	task.wait(3)
+	workspace:SetAttribute("CoreIsOn",false)
 	game:GetService("TweenService"):Create(core.Core.Main,TweenInfo.new(5),{Transparency = 1}):Play()
 	core.Lasers.Model1.laser1.ParticleEmitter.Enabled = false
 	core.Lasers.Model1.noooooo.ParticleEmitter.Enabled = false
@@ -207,6 +205,10 @@ function shutdown()
 	task.wait(6)
 	core.Lasers.Model7.kthx.ParticleEmitter.Enabled = false
 	core.Lasers.Model7.noproblem.ParticleEmitter.Enabled = false
+	task.wait(3)
+	notify("Shutdown","The Primary Reactor has shut down.",5)
+	
+
 end
 
 function stop (m)
@@ -245,7 +247,7 @@ if workspace.GameData.EcoCC.ReactorStats.ShutD.Value == false then
 	task.wait(7)
 	notify("Shutdown","but we will see how this pans out.",5)-- especially to other player
 	task.wait(7)
-	if workspace.GameData.EcoCC.KillSwitches.Value >= 7  and workspace.GameData.EcoCC.ReactorStats.OverloadMix.Value == false and CanFail <= 98 then -- kill switches on, coolant on
+	if workspace.GameData.EcoCC.KillSwitches.Value >= 7  and workspace.GameData.EcoCC.ReactorStats.OverloadMix.Value == false and CanFail <= 90 then -- kill switches on, coolant on
 		audiosfx.Intercoms.bell:Play()
 		task.wait(1.7)
 		notify("Shutdown","Disconnecting Reactor from Facility Power",5)
@@ -287,7 +289,7 @@ if workspace.GameData.EcoCC.ReactorStats.ShutD.Value == false then
 		ReplicatedStorage.RemotesEvents.GuiEvents.Cinematic:FireAllClients(false)
 		task.wait(6)
 		script.Disabled = true
-	elseif workspace.GameData.EcoCC.KillSwitches.Value <= 7 and workspace.GameData.EcoCC.ReactorStats.OverloadMix.Value == false and CanFail >= 99 then -- kill switches off, coolant off
+	elseif workspace.GameData.EcoCC.KillSwitches.Value <= 7 and workspace.GameData.EcoCC.ReactorStats.OverloadMix.Value == false and CanFail >= 91 then -- kill switches off, coolant off
 		audiosfx.Intercoms.bell:Play()
 		task.wait(1.7)
 		notify("Shutdown","Disconnecting Reactor from Facility Power",5)

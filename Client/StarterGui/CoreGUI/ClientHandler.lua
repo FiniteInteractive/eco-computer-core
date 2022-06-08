@@ -7,8 +7,7 @@ Code by: Cosmos (@gloopyreverb)
 Reverb Studio 2022-2023
 ]]
 
--- LIBRARIES
---local sound = require(script.Parent.Parent.RGUI)
+-- Libraries
 local Players = game:GetService("Players")
 local ts = game:GetService("TeleportService") --Gather the game service=
 local CoreGUI = script.Parent
@@ -56,10 +55,18 @@ local tools = {
 	["Reactor Tablet"] = ReplicatedStorage.Components.Tools.Shop_Tools['Reactor Tablet'];
 	Hyperbike = ReplicatedStorage.Components.Tools.Shop_Tools['Hyperbike'];
 	SpellOfHeat = ReplicatedStorage.Components.Tools.Shop_Tools['SpellOfHeat'];
+	["Phantom Buddy"] = ReplicatedStorage.Components.Tools.Shop_Tools['Phantom Buddy'];
+	["Ruby Buddy"] = ReplicatedStorage.Components.Tools.Shop_Tools['Ruby Buddy'];
+	["Bloxy Cola"] = ReplicatedStorage.Components.Tools.Shop_Tools['Bloxy Cola'];
+	["Very Dull Pick"] = ReplicatedStorage.Components.Tools.Shop_Tools['Very Dull Pick'];
+	["Speed Coil"] = ReplicatedStorage.Components.Tools.Shop_Tools['Acceleration Coil'];
+
 }
 local slot1 = script.Parent.CombineMenu.InteractionMenu.From.Craft1.Slot1
 local slot2 = script.Parent.CombineMenu.InteractionMenu.From.Craft1.Slot2
 local result = script.Parent.CombineMenu.InteractionMenu.To.Frame.Slot3
+
+local PickSlot = script.Parent.RepairPickMenu.InteractionMenu.To.Frame.Slot1
 
 local redonmelt = Color3.fromRGB(253, 116, 98)
 
@@ -237,6 +244,8 @@ local function tweeny(frame, transparency)
 				elseif v:IsA("TextButton") then
 					TweenService:Create(v, TweenInfo.new(0.5), {TextTransparency = transparency}):Play()
 					TweenService:Create(v, TweenInfo.new(0.5), {BackgroundTransparency = transparency}):Play()
+				elseif v:IsA("Frame") and v.Name == "Settings" then
+					TweenService:Create(v, TweenInfo.new(0.5), {BackgroundTransparency = 0.5}):Play()
 				end	
 			end
 		end
@@ -288,20 +297,8 @@ function updateonjoin() -- Updates when player joins the game.
 	tweeny(script.Parent.About,1)
 	tweeny(script.Parent.Credits,1)
 	tweeny(script.Parent.Donate,1)
+	script.Parent.CaveUIResearchUI["*BackpackStorageAndBlockedMined"].Text = "Blocks Mined: "..player:WaitForChild("Blocks").Value
 	player:WaitForChild("Inventory",3)
-	if player.FeedbackString.Value then
-		script.Parent.Replies.InteractionMenu.RepliesFrame.Reply.Visible = true
-		script.Parent.Replies.InteractionMenu.Disclaimer.Visible = true
-		script.Parent.Replies.InteractionMenu.RepliesFrame.Reply.Body.Text = player.FeedbackString.Value
-		script.Parent.Feedback.NewMsgs.Visible = true
-		script.Parent.Replies.InteractionMenu.NoMsgs.Visible = true
-	elseif player.FeedbackString.Value == nil or player.FeedbackString.Value == 0 then
-		script.Parent.Replies.InteractionMenu.RepliesFrame.Reply.Visible = false
-		script.Parent.Replies.InteractionMenu.Disclaimer.Visible = false
-		script.Parent.Replies.InteractionMenu.RepliesFrame.Reply.Body.Text = "No message body."
-		script.Parent.Feedback.NewMsgs.Visible = false
-		script.Parent.Replies.InteractionMenu.NoMsgs.Visible = true
-	end
 	if (MarketplaceService:UserOwnsGamePassAsync(player.UserId, id2)) or (MarketplaceService:UserOwnsGamePassAsync(player.UserId, id)) then
 		script.Parent.Settings.MainContext.Others.InsRespawnOff.Visible = true
 		script.Parent.Settings.MainContext.Others.InsRespawnOn.Visible = true
@@ -321,7 +318,13 @@ function updateonjoin() -- Updates when player joins the game.
 	end
 	script.Parent.Resources["*OreList"].Frame.Iron.Text = player.Inventory.Iron.Value.." Iron"
 	if player.Inventory.Iron.Value == 0 then
+		script.Parent.RepairPickMenu.ResourcesMenu.InteractionMenu.Frame["Iron Pick"].Visible = false
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Iron.Visible = false
+	elseif player.Inventory.Iron.Value >= 1 then
+		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Iron.Visible = true
+		script.Parent.RepairPickMenu.ResourcesMenu.InteractionMenu.Frame["Iron Pick"].Visible = false
+	elseif player.Inventory.Iron.Value >= 5 and not player.player.Inventory.Iron.Value <= 4 then
+		script.Parent.RepairPickMenu.ResourcesMenu.InteractionMenu.Frame["Iron Pick"].Visible = true
 	end
 	script.Parent.Resources["*OreList"].Frame.Oxygen.Text = player.Inventory.Oxygen.Value.." Oxygen"
 	if player.Inventory.Oxygen.Value == 0 then
@@ -333,13 +336,19 @@ function updateonjoin() -- Updates when player joins the game.
 	if player.Inventory.Ruby.Value == 0 then
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Ruby.Visible = false
 	elseif player.Inventory.Ruby.Value >= 1 then
+		script.Parent.RepairPickMenu.ResourcesMenu.InteractionMenu.Frame["Ruby Pick"].Visible = false
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Ruby.Visible = true
+		script.Parent.RepairPickMenu.ResourcesMenu.InteractionMenu.Frame["Ruby Pick"].Visible = false
+	elseif player.Inventory.Ruby.Value >= 10 and not player.player.Inventory.Ruby.Value <= 9 then
+		script.Parent.RepairPickMenu.ResourcesMenu.InteractionMenu.Frame["Ruby Pick"].Visible = true
 	end
 	script.Parent.Resources["*OreList"].Frame.Phantom.Text = player.Inventory.Phantom.Value.." Phantom"
 	if player.Inventory.Phantom.Value == 0 then
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Phantom.Visible = false
 	elseif player.Inventory.Phantom.Value >= 1 then
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Phantom.Visible = true
+	elseif player.Inventory.Phantom.Value >= 10 and not player.player.Inventory.Phantom.Value <= 9 then
+		script.Parent.RepairPickMenu.ResourcesMenu.InteractionMenu.Frame["Phantom Pick"].Visible = true
 	end
 	script.Parent.Resources["*OreList"].Frame.Hydrogen.Text = player.Inventory.Hydrogen.Value.." Hydrogen"
 	if player.Inventory.Hydrogen.Value == 0 then
@@ -456,6 +465,11 @@ function explosionEnd() -- plays every explosion sound effect in the folder
 		end
 	end
 end
+
+player:WaitForChild("Blocks").Changed:Connect(function(num)
+	script.Parent.CaveUIResearchUI["*BackpackStorageAndBlockedMined"].Text = "Blocks Mined: "..num
+end)
+
 
 function navigation(enable_or_disable,location) -- shows navigation ui
 	if enable_or_disable == true then
@@ -824,7 +838,7 @@ script.Parent.MiniMenu.MouseButton1Click:Connect(function()
 			and not UIS.GamepadEnabled and not GuiService:IsTenFootInterface() then
 			script.Parent.Menu:TweenPosition(UDim2.new(0.007, 0, 0.399, 0))
 		else
-			script.Parent.Menu:TweenPosition(UDim2.new(0.007, 0, 0.399, 0))
+			script.Parent.Menu:TweenPosition(UDim2.new(0.009, 0, 0.399, 0))
 		end
 		task.wait(0.05)
 		menu = false
@@ -832,9 +846,9 @@ script.Parent.MiniMenu.MouseButton1Click:Connect(function()
 		script.Parent.Parent.Click:Play()
 		if UIS.TouchEnabled and not UIS.KeyboardEnabled and not UIS.MouseEnabled
 			and not UIS.GamepadEnabled and not GuiService:IsTenFootInterface() then
-			script.Parent.Menu:TweenPosition(UDim2.new(-0.25, 0, 0.399, 0))
+			script.Parent.Menu:TweenPosition(UDim2.new(-0.3, 0, 0.399, 0))
 		else
-			script.Parent.Menu:TweenPosition(UDim2.new(-0.25, 0, 0.399, 0))
+			script.Parent.Menu:TweenPosition(UDim2.new(-0.31, 0, 0.399, 0))
 		end
 		task.wait(0.05)
 		menu = true
@@ -870,22 +884,11 @@ script.Parent.MenuButton.MouseButton1Click:Connect(function()
 	end
 end)
 
---script.Parent.MenuButton.MouseButton1Down:Connect(function()
---	TweenService:Create(game.Lighting.uiBlur, TweenInfo.new(0.5), {Size = blurwhenui_ison}):Play()
---	script.Parent.LongPressMenu:TweenPosition(tweenNerd.OpenPos.PositionMenu)
---	tweeny(script.Parent.LongPressMenu,0.5)
---	script.Parent.Parent.LongPress:Play()
---end)
 
 script.Parent.MenuButton.MouseEnter:Connect(function()
 	script.Parent.Parent.Hover:Play()
 end)
 
---script.Parent.LongPressMenu.Menu.Exit.MouseButton1Click:Connect(function()
---	script.Parent.LongPressMenu:TweenPosition(tweenNerd.ClosePos.PositionMenu)
---	tweeny(script.Parent.LongPressMenu,1)
---	TweenService:Create(game.Lighting.uiBlur, TweenInfo.new(0.5), {Size = 0}):Play()
---end)
 
 ReplicatedStorage.RemotesEvents.GuiEvents.AddFacilityStatus.OnClientEvent:Connect(function(text,sec)
 	script.Parent.FacilityStatus.txt.TextLabel.Text = text
@@ -918,22 +921,23 @@ end)
 ReplicatedStorage.RemotesEvents.GuiEvents.GotOreEvent.OnClientEvent:Connect(function(ore)
 	if ore == "Ruby" then
 		script.Parent.Parent.Hooray:Play()
-		script.Parent.CaveUIResearchUI.GotOre.Visble = true
+		script.Parent.CaveUIResearchUI.GotOre.Visible = true
 		script.Parent.CaveUIResearchUI.GotOre.Frame.TextLabel.Text = "You got a Ruby Ore!"
 		game:GetService("TweenService"):Create(script.Parent.Resources["*OreList"].Frame.Ruby, TweenInfo.new(0.5,Enum.EasingStyle.Linear), {BorderSizePixel = 8}):Play()
 		task.wait(5)
-		script.Parent.CaveUIResearchUI.GotOre.Visble = false
+		script.Parent.CaveUIResearchUI.GotOre.Visible = false
 		game:GetService("TweenService"):Create(script.Parent.Resources["*OreList"].Frame.Ruby, TweenInfo.new(0.5,Enum.EasingStyle.Linear), {BorderSizePixel = 0}):Play()
 	elseif ore == "Phantom" then
 		script.Parent.Parent.Hooray:Play()
-		script.Parent.CaveUIResearchUI.GotOre.Visble = true
+		script.Parent.CaveUIResearchUI.GotOre.Visible = true
 		script.Parent.CaveUIResearchUI.GotOre.Frame.TextLabel.Text = "You got a Phantom Ore!"
 		game:GetService("TweenService"):Create(script.Parent.Resources["*OreList"].Frame.Phantom, TweenInfo.new(0.5,Enum.EasingStyle.Linear), {BorderSizePixel = 8}):Play()
 		task.wait(5)
-		script.Parent.CaveUIResearchUI.GotOre.Visble = false
+		script.Parent.CaveUIResearchUI.GotOre.Visible = false
 		game:GetService("TweenService"):Create(script.Parent.Resources["*OreList"].Frame.Phantom, TweenInfo.new(0.5,Enum.EasingStyle.Linear), {BorderSizePixel = 0}):Play()
 	elseif ore == "Iron" then
-		script.Parent.Parent.Hooray:Play()
+		script.Parent.Parent.Hooray:Play()		
+		script.Parent.CaveUIResearchUI.GotOre.Visible = true
 		script.Parent.CaveUIResearchUI.GotOre.Frame.TextLabel.Text = "You got an Iron Ore!"
 		game:GetService("TweenService"):Create(script.Parent.Resources["*OreList"].Frame.Iron, TweenInfo.new(0.5,Enum.EasingStyle.Linear), {BorderSizePixel = 8}):Play()
 		task.wait(5)
@@ -1388,7 +1392,9 @@ end)
 script.Parent.Menu.Shop.MouseButton1Click:Connect(function()
 	script.Parent.ShopUI.Visible = true
 	uiOpen()
-	script.Parent.LocalMusic.PreloadingAndShopTheme:Play()
+	game:GetService("TweenService"):Create(game.SoundService.SongsCanMute,TweenInfo.new(0.8),{Volume = 0}):Play()
+	task.wait(0.5)
+	script.Parent.Parent.LocalMusic.PreloadingAndShopTheme:Play()
 end)
 
 local Settings = script.Parent.Settings
@@ -1573,6 +1579,52 @@ script.Parent.CombineMenu.InteractionMenu.ExitFrame.Forge.MouseButton1Click:Conn
 end)
 
 
+
+local RepairPickButtons = {}
+
+
+for _, button in pairs(script.Parent.RepairPickMenu.ResourcesMenu.InteractionMenu.Frame:GetChildren()) do
+	if button:IsA('ImageButton') then
+		button.MouseButton1Click:Connect(function()
+			local crystal = script.Parent.RepairPickMenu.ResourcesMenu.InteractionMenu.Frame:FindFirstChild(button.Name)
+			if crystal then
+				if PickSlot:GetAttribute("Repairing") == true then
+					PickSlot.Image = crystal.Image
+					PickSlot:SetAttribute("Pick",crystal.Name)
+					PickSlot:SetAttribute("Repairing",false)
+				end
+			end
+		end)
+	end
+end
+
+
+script.Parent.RepairPickMenu.InteractionMenu.ExitFrame.Clear.MouseButton1Click:Connect(function()
+	PickSlot.Image = 'rbxassetid://0'
+	PickSlot:SetAttribute("Repairing",true)
+end)
+
+script.Parent.RepairPickMenu.InteractionMenu.ExitFrame.Exit.MouseButton1Click:Connect(function()
+	script.Parent.RepairPickMenu.Visible = false
+	uiClose()
+end)
+
+
+script.Parent.RepairPickMenu.InteractionMenu.ExitFrame.Repair.MouseButton1Click:Connect(function()
+	local combo = PickSlot:GetAttribute("Pick")
+	if combo then
+		result.Image = script.Parent.RepairPickMenu.ResourcesMenu.InteractionMenu.Frame:FindFirstChild(combo).Image
+		game.ReplicatedStorage.RemotesEvents.GameEvents.MiningCrafting.RepairPick:FireServer(combo) -- Hackers, the server-side script is protected. It checks if you actually have the vaild resources.
+	else
+		result.Image = 'rbxassetid://8420109354'
+	end
+end)
+
+
+
+
+
+
 ReplicatedStorage.RemotesEvents.GuiEvents.AddAchievement.OnClientEvent:Connect(function(type)
 	if type == "Startup" then
 		script.Parent.AchievementUIs.YouStarted.Visible = true
@@ -1743,24 +1795,40 @@ script.Parent.SecretMarketUI.MainContext.Gear.GearContainer.SpellOfHeat.MouseBut
 	selectedgear.Value = "SpellOfHeat"
 end)
 
---script.Parent.ShopUI.MainContext.Gear.GearContainer.Clipboard.MouseButton1Click:Connect(function()
---	script.Parent.ShopUI.MainContext.Gear.GearContainer.ReactorTablet.BorderSizePixel = 0
---	script.Parent.ShopUI.MainContext.Gear.GearContainer.Hyperbike.BorderSizePixel = 0
---	script.Parent.ShopUI.MainContext.Gear.GearContainer.Clipboard.BorderSizePixel = 10
---	selectedgear.Value = "Clipboard"
---end)
---script.Parent.ShopUI.MainContext.Gear.GearContainer.Hyperbike.MouseButton1Click:Connect(function()
---	script.Parent.ShopUI.MainContext.Gear.GearContainer.ReactorTablet.BorderSizePixel = 0
---	script.Parent.ShopUI.MainContext.Gear.GearContainer.Hyperbike.BorderSizePixel = 10
---	script.Parent.ShopUI.MainContext.Gear.GearContainer.Clipboard.BorderSizePixel = 0	
---	selectedgear.Value = "Hyperbike"
---end)
---script.Parent.ShopUI.MainContext.Gear.GearContainer.ReactorTablet.MouseButton1Click:Connect(function()
---	script.Parent.ShopUI.MainContext.Gear.GearContainer.ReactorTablet.BorderSizePixel = 10
---	script.Parent.ShopUI.MainContext.Gear.GearContainer.Hyperbike.BorderSizePixel = 0
---	script.Parent.ShopUI.MainContext.Gear.GearContainer.Clipboard.BorderSizePixel = 0
---	selectedgear.Value = "Reactor Tablet"
---end)
+script.Parent.ShopUI.MainContext.Gear.GearContainer.Row2["1Clipboard"].MouseButton1Click:Connect(function()
+	selectedgear.Value = "Clipboard"
+	script.Parent.ShopUI.Preview.Visible = true
+end)
+script.Parent.ShopUI.MainContext.Gear.GearContainer.Row2["4Hyperbike"].MouseButton1Click:Connect(function()
+	selectedgear.Value = "Hyperbike"
+	script.Parent.ShopUI.Preview.Visible = true
+end)
+script.Parent.ShopUI.MainContext.Gear.GearContainer.Row2["3ReactorTablet"].MouseButton1Click:Connect(function()
+	selectedgear.Value = "Reactor Tablet"
+	script.Parent.ShopUI.Preview.Visible = true
+end)
+script.Parent.ShopUI.MainContext.Gear.GearContainer.Row2["2Coils"].MouseButton1Click:Connect(function()
+	selectedgear.Value = "Speed Coil"
+	script.Parent.ShopUI.Preview.Visible = true
+end)
+
+
+script.Parent.ShopUI.MainContext.Gear.GearContainer.Row1["1VeryDullPick"].MouseButton1Click:Connect(function()
+	selectedgear.Value = "Very Dull Pick"
+	script.Parent.ShopUI.Preview.Visible = true
+end)
+script.Parent.ShopUI.MainContext.Gear.GearContainer.Row1["2Bloxy"].MouseButton1Click:Connect(function()
+	selectedgear.Value = "Bloxy Cola"
+	script.Parent.ShopUI.Preview.Visible = true
+end)
+script.Parent.ShopUI.MainContext.Gear.GearContainer.Row1["3RubyCosmetic"].MouseButton1Click:Connect(function()
+	selectedgear.Value = "Ruby Buddy"
+	script.Parent.ShopUI.Preview.Visible = true
+end)
+script.Parent.ShopUI.MainContext.Gear.GearContainer.Row1["4PhantomCosmetic"].MouseButton1Click:Connect(function()
+	selectedgear.Value = "Phantom Buddy"
+	script.Parent.ShopUI.Preview.Visible = true
+end)
 
 script.Parent.ShopUI.AreYouSure.Confirmation.InteractionMenu.ChoiceFrame.Confirm.MouseButton1Click:Connect(function()
 	script.Parent.ShopUI.AreYouSure.Processsing.Visible = true
@@ -1871,47 +1939,63 @@ script.Parent.Settings.MainContext.Accessibility.SetCaptionBG.MouseButton1Click:
 	end
 end)
 
+script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Choices.Discon.MouseButton1Click:Connect(function()
+	script.Parent.ShopUI.Preview.Visible = false
+	selectedgear.Value = "None"
+end)
+
+script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Choices.Okay.MouseButton1Click:Connect(function()
+	script.Parent.ShopUI.Preview.Visible = false
+	script.Parent.ShopUI.AreYouSure.Visible = true
+	script.Parent.ShopUI.AreYouSure.Confirmation.Visible = true
+end)
 
 
 selectedgear.Changed:Connect(function(newtooloption)
+	if newtooloption ~= "None" then
+	script.Parent.ShopUI.AreYouSure.ThankYou.InteractionMenu.WhatNeedsToBeCombined.Text = "You have successfully purchased "..tools[newtooloption].Name.."!"
+	script.Parent.ShopUI.AreYouSure.Confirmation.InteractionMenu.Title.Text = "Get "..newtooloption.."?"
+	script.Parent.ShopUI.Preview.Prompt.InteractionMenu.PricePreview.Text = "This item is "..tools[newtooloption].Price.Value.." Eco"
+	script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Title.Text = newtooloption
+	script.Parent.ShopUI.AreYouSure.Confirmation.InteractionMenu.BeWise.Text = "You'll lose " ..tools[newtooloption].Price.Value.." Eco."
 	if newtooloption == "Clipboard" then
-		--script.Parent.ShopUI.MainContext.Gear.ItemDescription.Price.Text = "This item is "..tools.Clipboard.Price.Value.." Eco"
-		--script.Parent.ShopUI.MainContext.Gear.ItemDescription.Desc.Text = "Take notes without any writing supplies."
-		--script.Parent.ShopUI.AreYouSure.Confirmation.InteractionMenu.Title.Text = "Are you sure you want to buy "..newtooloption.."?"
+		script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "Take notes without any writing supplies. Don't @ me."
 	elseif newtooloption == "Reactor Tablet" then
-		--script.Parent.ShopUI.MainContext.Gear.ItemDescription.Desc.Text = "On the go Reactor Temperatures."
-		--script.Parent.ShopUI.AreYouSure.Confirmation.InteractionMenu.Title.Text = "Are you sure you want to buy "..newtooloption.."?"
-		--script.Parent.ShopUI.MainContext.Gear.ItemDescription.Price.Text = "This item is "..tools["Reactor Tablet"].Price.Value.." Eco"
+		script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "On the go reactor temperatures."
 	elseif newtooloption == "SpellOfHeat" then
-		--script.Parent.SecretMarketUI.MainContext.Gear.ItemDescription.Desc.Text = 'Easily heat up the reactor quickly without the "Direct Heat" nonsense.'
-		--script.Parent.SecretMarketUI.AreYouSure.Confirmation.InteractionMenu.Title.Text = "Are you sure you want to buy "..newtooloption.."?"
-		--script.Parent.SecretMarketUI.MainContext.Gear.ItemDescription.Price.Text = "This item is "..tools["SpellOfHeat"].Price.Value.." Eco"
+		script.Parent.SecretMarketUI.MainContext.Gear.ItemDescription.Desc.Text = 'Easily heat up the reactor quickly without the "Direct Heat" nonsense.'
+		script.Parent.SecretMarketUI.AreYouSure.Confirmation.InteractionMenu.Title.Text = "Are you sure you want to buy "..newtooloption.."?"
+		script.Parent.SecretMarketUI.MainContext.Gear.ItemDescription.Price.Text = "This item is "..tools["SpellOfHeat"].Price.Value.." Eco"
 	elseif newtooloption == "Hyperbike" then
-		--script.Parent.ShopUI.MainContext.Gear.ItemDescription.Desc.Text = "Faster than the cars we have!"
-		--script.Parent.ShopUI.AreYouSure.Confirmation.InteractionMenu.Title.Text = "Are you sure you want to buy "..newtooloption.."?"
-		--script.Parent.ShopUI.MainContext.Gear.ItemDescription.Price.Text = "This item is "..tools.Hyperbike.Price.Value.." Eco"
+		script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "This hyperbike is futuristic and it's faster than the cars we have!"
+	elseif newtooloption == "Ruby Buddy" then
+		script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "It's a shoulder buddy, but cool. And it's a Rare Ore."
+	elseif newtooloption == "Phantom Buddy" then
+		script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "It's a shoulder buddy, but cooler. And it's an Ultra Rare ore."
+	elseif newtooloption == "Bloxy Cola" then
+		script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "Unlimited refreshers! You'll never lose this, like, ever."
+	elseif newtooloption == "Very Dull Pick" then
+		script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "You must be really daring to own this piece of junk. Maybe you can use it as a sovenuir?"
 	elseif newtooloption == "None" then
-		--script.Parent.ShopUI.MainContext.Gear.ItemDescription.Desc.Text = "Select an item."
-		--script.Parent.ShopUI.AreYouSure.Confirmation.InteractionMenu.Title.Text = "Are you sure you want to buy "..newtooloption.."?"
-		--script.Parent.ShopUI.MainContext.Gear.ItemDescription.Price.Text = "Select an item to see the price."
-		--script.Parent.ShopUI.MainContext.Gear.GearContainer.ReactorTablet.BorderSizePixel = 0
-		--script.Parent.ShopUI.MainContext.Gear.GearContainer.Hyperbike.BorderSizePixel = 0
-		--script.Parent.ShopUI.MainContext.Gear.GearContainer.Clipboard.BorderSizePixel = 0
+		return "why"
+		end
 	end
 end)
 
 ReplicatedStorage.RemotesEvents.GuiEvents.OtherUiController.OnClientEvent:Connect(function(which,thank)
 	if which == "Shop" and thank == "ThankYou" then
-
 		script.Parent.Parent.Success:Play()
 		script.Parent.ShopUI.AreYouSure.Processsing.Visible = false
 		script.Parent.ShopUI.AreYouSure.ThankYou.Visible = true
 	elseif which == "Shop" and thank == "Owned" then
 		script.Parent.ShopUI.AreYouSure.Owned.Visible = true
+		script.Parent.ShopUI.AreYouSure.Owned.InteractionMenu.WhatNeedsToBeCombined.Text = "You already own this item."
 		script.Parent.ShopUI.AreYouSure.Processsing.Visible = false
+		script.Parent.Parent.Error:Play()
 	elseif which == "SecretMarket" and thank == "Owned" then
 		script.Parent.SecretMarketUI.AreYouSure.Processsing.Visible = false
 		script.Parent.SecretMarketUI.AreYouSure.Owned.Visible = true
+		script.Parent.Parent.Error:Play()
 	elseif which == "SecretMarket" and thank == "ThankYou" then
 		script.Parent.SecretMarketUI.AreYouSure.Processsing.Visible = false
 		script.Parent.SecretMarketUI.AreYouSure.ThankYou.Visible = true
@@ -1932,11 +2016,11 @@ ReplicatedStorage.RemotesEvents.GuiEvents.OtherUiController.OnClientEvent:Connec
 		script.Parent.ShopUI.AreYouSure.Processsing.Visible = false
 		script.Parent.Parent.Error:Play()
 		script.Parent.ShopUI.AreYouSure.MoreEcoPls.Visible = true
-		if which == "Cave" and "Iron" then
-			script.Parent.CaveUIResearchUI.MustHaveIron.Visible = true
-			task.wait(10)
-			script.Parent.CaveUIResearchUI.MustHaveIron.Visible = false
-		end
+	end
+	if which == "Cave" and "Iron" then
+		script.Parent.CaveUIResearchUI.MustHaveIron.Visible = true
+		task.wait(10)
+		script.Parent.CaveUIResearchUI.MustHaveIron.Visible = false
 	end
 end)
 
@@ -1959,6 +2043,8 @@ end)
 
 script.Parent.ShopUI.ActionBar.Exit.MouseButton1Click:Connect(function()
 	script.Parent.ShopUI.Visible = false
+	script.Parent.Parent.LocalMusic.PreloadingAndShopTheme:Stop()
+	game:GetService("TweenService"):Create(game.SoundService.SongsCanMute,TweenInfo.new(0.8),{Volume = 1.985}):Play()
 	uiClose()
 end)
 
@@ -2042,6 +2128,8 @@ end)
 
 script.Parent.Settings.MainContext.Others.FeatureLogToggle.MouseButton1Click:Connect(function()
 	script.Parent.FeatureUpdate.Visible = true
+	script.Parent.Settings.Visible = false
+	uiClose()
 end)
 
 ReplicatedStorage.RemotesEvents.GameEvents.Nuclear.OverloadMeltdownEnding.OnClientEvent:Connect(function()
@@ -2193,22 +2281,6 @@ script.Parent.Tutorial.EarnEco.Exit.MouseButton1Click:Connect(function()
 	script.Parent.Tutorial.Welcome.Visible = true
 end)
 
-Players.LocalPlayer.FeedbackString.Changed:Connect(function(txt)
-	if txt then
-		script.Parent.Replies.InteractionMenu.RepliesFrame.Reply.Visible = true
-		script.Parent.Replies.InteractionMenu.Disclaimer.Visible = true
-		script.Parent.Replies.InteractionMenu.RepliesFrame.Reply.Body.Text = txt
-		script.Parent.Feedback.NewMsgs.Visible = true
-		script.Parent.Replies.InteractionMenu.NoMsgs.Visible = true
-	elseif txt == nil or 0 then
-		script.Parent.Replies.InteractionMenu.RepliesFrame.Reply.Visible = false
-		script.Parent.Replies.InteractionMenu.Disclaimer.Visible = false
-		script.Parent.Replies.InteractionMenu.RepliesFrame.Reply.Body.Text = "No message body."
-		script.Parent.Feedback.NewMsgs.Visible = false
-		script.Parent.Replies.InteractionMenu.NoMsgs.Visible = true
-	end
-end)
-
 script.Parent.NoHazmat.HazmatAdvise.InteractionMenu.ExitFrame.Ok.MouseButton1Click:Connect(function()
 	script.Parent.NoHazmat.Visible = false
 end)
@@ -2324,3 +2396,13 @@ end)
 
 
 updateonjoin()
+
+workspace:WaitForChild("ShopProx2",9).ProximityPrompt.Triggered:Connect(function()
+	uiOpen()
+	script.Parent.SellOres.Visible = true
+end)
+
+workspace:WaitForChild("ShopProx3",9).ProximityPrompt.Triggered:Connect(function()
+	uiOpen()
+	script.Parent.SellOres.Visible = true
+end)

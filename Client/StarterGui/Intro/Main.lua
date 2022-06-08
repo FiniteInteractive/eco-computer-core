@@ -39,7 +39,7 @@ end
 task.wait(0.5)
 script.Parent.Parent:WaitForChild("Chat",5).Enabled = false
 
--- FADE OUT for preloading
+-- FADE OUT tweening
 local function tweeny(frame, transparency)
 	if script.Parent.Parent.CoreGUI.IsAnimationsReduced.Value == false then
 		TweenService:Create(frame, TweenInfo.new(0.5), {Transparency = transparency}):Play()

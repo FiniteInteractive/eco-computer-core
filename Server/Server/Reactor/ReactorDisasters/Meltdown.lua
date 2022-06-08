@@ -1,12 +1,8 @@
 --[[
 Meltdown
-FCC V7, Script
 by gloopyreverb
+07/30/2021
 ]]
-
-
--- TODO 
---Regeneration; debris and bunker handling
 
 -- Libraries
 
@@ -198,7 +194,7 @@ end)
 function explosionNOW()
 	if game.ServerScriptService.Server.Reactor.ReactorEvents.ShutdownSystem.Disabled == true or game.ServerScriptService.Server.Reactor.ReactorEvents.ReactorDisasters.ShutdownFailure.Disabled == true then
 		boom_module.Boom()
-		task.wait(boom_module.delay + math.random(1,4))
+		task.wait(boom_module.delay)
 		replicatedstorage.Events.General.Regen:Fire() -- note that regeneration is a --14 second process-- 
 		task.wait(2)
 		if self:WaitForChild("ReactorStats",16).ShutD.Value == false then
@@ -221,6 +217,22 @@ function explosionNOW()
 	end
 end
 
+function flicker()
+	task.wait(0.25)
+	power("On")
+	task.wait(0.25)
+	power("Off")
+	task.wait(0.25)
+	power("On")
+	task.wait(0.25)
+	power("Off")
+	task.wait(0.25)
+	power("On")
+	task.wait(0.25)
+	power("On")
+	task.wait(0.25)
+	power("Off")
+end
 
 -- Main
 -- intercom option off	
@@ -228,6 +240,7 @@ if self.ReactorStats.ShutD.Value == false then
 	CollectionService:RemoveTag(workspace.World.NPCs.WanderAreas.ParkWanderArea, "pathfindable")
 	CollectionService:RemoveTag(workspace.World.NPCs.WanderAreas.FacilityEntranceWanderArea, "pathfindable")
 	CollectionService:RemoveTag(workspace.World.NPCs.WanderAreas.ParkingLotWanderArea, "pathfindable")
+	workspace.GameData.EcoCC.ReactorStats.FlickerStats:Fire("Meltdown")
 	workspace.GameData.EcoCC.ReactorStats.NewPlayerState.Value = true
 	self.ReactorStats.IsDisaster.Value = true
 	task.wait(3)
@@ -269,6 +282,7 @@ if self.ReactorStats.ShutD.Value == false then
 	fade(self.SFX.Alarms.AlarmBlur,"In")
 	audiosfx.OutNoPow3:Play()
 	task.wait(14)
+	facility.ImportantFacilityAreas.PrimaryReactorArea.ControlRoom.EvacSigns.UnsafeLoop.Disabled = false
 	audiosfx.Alarms.WarningAboutTo:Play()
 	wait(2)
 	power("On")
@@ -277,7 +291,6 @@ if self.ReactorStats.ShutD.Value == false then
 	audiosfx.Announcements.CodeYellow:Play()
 	task.wait(4)
 	fade(self.SFX.Alarms.AlarmBlur,"Out")
-	facility.ImportantFacilityAreas.PrimaryReactorArea.ControlRoom.EvacSigns.EmergencyMode.Disabled = false
 	notify("Code Yellow","Warning! A code yellow has been issued! If you're not working on the reactor, please evacuate the area.",6)
 	task.wait(33)
 	ReplicatedStorage.RemotesEvents.GuiEvents.Captions:FireAllClients("Music plays",6)
@@ -328,8 +341,12 @@ if self.ReactorStats.ShutD.Value == false then
 	wait(6)
 	fade(self.GeneralMusic.Meltdown.Meltdown_Detected,"Out")
 	self.GeneralMusic.Meltdown.StingerToPartA:Play()
+	flicker()
+	flicker()
+	flicker()
+	flicker()
 	core.lIGHT.Alarm:Stop()
-	task.wait(7.5)
+	task.wait(0.5)
 	fade(self.SFX.OccasionalMeltdownAmbience,"Out")
 	ready()
 	self.SFX.Intercoms.bell:Play()
@@ -338,20 +355,25 @@ if self.ReactorStats.ShutD.Value == false then
 	replicatedstorage.Events.General.WoopShocking:FireAllClients()
 	audiosfx.ExplosionSoundEffects.ExplosionIdk:Play()
 	self.SFX.Alarms.MeltdownDramatic.Alarm1:Play()
+	power("Off")
 	importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.Status.Enabled = false
 	importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.Meltdown.Enabled = true
 	task.wait(5)
-	ReplicatedStorage.RemotesEvents.GuiEvents.Captions:FireAllClients("Danger, Reactor Meltdown. Evacuate at once.",6)
+	ReplicatedStorage.RemotesEvents.GuiEvents.Captions:FireAllClients("Danger, Reactor Meltdown. Evacuate at once.",5)
 	self.SFX.Announcements.DReactorMeltdown:Play()
-	task.wait(5)
+	task.wait(2)
+	power("On")
+	task.wait(3.45)
 	ReplicatedStorage.RemotesEvents.GuiEvents.Captions:FireAllClients("'INCOMING PHOTON BEAM' by EGGPRIEST plays",6)
 	fade(self.GeneralMusic.Meltdown.MeltdownPartA,"In")
 	wait(6)
 	audiosfx.PreMeltAlarm:Play()
 	wait(4)
 	audiosfx.Doom2atmospheric:Play()
+	importantfacilityarea.PrimaryReactorArea.ControlRoom.EvacSigns.UnsafeLoop.Disabled = true
 	audiosfx.Alarms.AlarmCodeRedWarning:Play()
 	wait(1)
+	importantfacilityarea.PrimaryReactorArea.ControlRoom.EvacSigns.EmergencyMode.Disabled = false
 	notify("Code Red","Attention! A code red has been issued by management. Please shut off the reactor or evacuate immediately!",6)
 	task.wait(1.5)
 	self.SFX.Intercoms.bell:Play()
@@ -562,8 +584,6 @@ if self.ReactorStats.ShutD.Value == false then
 			replicatedstorage.Events.General.WoopShocking:FireAllClients()
 
 			unanchor2(core.Lasers.Model1)
-			unanchor2(core.Lasers.Model2)
-			unanchor2(core.Lasers.Model3)
 			local e = Instance.new("Explosion")
 			e.Parent = game.Workspace
 			e.Position = core.Lasers.Model1.Part.Position
@@ -580,6 +600,10 @@ if self.ReactorStats.ShutD.Value == false then
 			wait(0.3)
 			audiosfx.PowerOn:Play()
 			power("Red")
+		end
+		if z == 195 then
+			audiosfx.ExplosionSoundEffects.Explosion:Play()
+			unanchor2(core.Lasers.Model3)
 		end
 		if z == 180 then
 			debris("glitchscreen")
@@ -623,6 +647,7 @@ if self.ReactorStats.ShutD.Value == false then
 			replicatedstorage.Events.General.WoopShocking:FireAllClients()
 			unanchor2(core.SpinnerReactorForm1)
 			unanchor2(core.SpinnerReactorForm2)
+			unanchor2(core.Lasers.Model2)
 			local e = Instance.new("Explosion")
 			e.Parent = game.Workspace
 			e.Position = core.SpinnerReactorForm1.Light.Position

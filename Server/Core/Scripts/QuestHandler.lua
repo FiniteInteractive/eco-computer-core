@@ -85,7 +85,7 @@ local function onPlayerJoin(player)  -- Runs when players join
 			Title = "Get 100 Eco."
 			Text = tostring("Quest Completed. You have earned "..Reward.." Eco!")
 			Icon = ""
-			if Coins.Value == false or player[eco].Value <= 99 then
+			if Coins.Value == false or player.leaderstats.Eco.Value <= 99 then
 				QuestModule.MonitorCurrency(player,100,Reward,{Title,Text,Icon})
 			elseif Coins.Value == true then
 				return "Is Already Done"
@@ -165,12 +165,20 @@ local function onPlayerJoin(player)  -- Runs when players join
 		clone.Parent = player.PlayerGui:WaitForChild("CoreGUI",6).Quests.QuestUI.QuestMenu.QuestsList
 		task.wait(0.05)
 	end
-	-- continous check
+	-- first and continous check
+	for _,v in pairs(player.Quests:GetDescendants()) do
+			if v:IsA("BoolValue") then
+				if v.Value == true then				
+					QuestEvent:FireClient(player,v.Name)
+				end
+		end
+	end
+	
 	for _,v in pairs(player.Quests:GetDescendants()) do
 		v.Changed:Connect(function()
 			if v:IsA("BoolValue") then
 				if v.Value == true then				
-					QuestEvent:FireClient(data,v.Name)
+					QuestEvent:FireClient(player,v.Name)
 				end
 			end
 		end)

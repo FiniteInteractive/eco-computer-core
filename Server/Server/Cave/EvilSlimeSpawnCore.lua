@@ -37,12 +37,11 @@ function spawnNPC()
 	return npc
 end
 
-
--- Spawn an NPC every 5 seconds, but also remove the old one.
 local count = 0
 while true do
 	if count >= 25 then
-		return "Ok"
+		task.wait(math.random(450,650))
+		count = 0
 	elseif count <= 24 then
 		spawnNPC()
 		count = count +math.random(1,2)
@@ -50,7 +49,3 @@ while true do
 	task.wait(0.45)
 end
 
-spawn(function()
-	task.wait(650)
-	count = 0
-end)

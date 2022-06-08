@@ -2,6 +2,7 @@
 Overload Meltdown
 Eco Computer Core Version 8
 by gloopyreverb
+09/29/2021
 ]]
 
 --[[
@@ -216,6 +217,7 @@ self.PowerOut:Fire()
 task.wait(1)
 audiosfx.Alarms.MeltdownDramatic.Alarm1:Play()
 core.lIGHT.Fire_Dust.Enabled = true
+workspace.GameData.EcoCC.ReactorStats.FlickerStats:Fire("OverloadMeltdown")
 core.lIGHT.Active.Color = ColorSequence.new(Color3.fromRGB(215, 41, 46))
 core.Core.Main.BrickColor = BrickColor.Black()
 task.wait(1)
@@ -235,6 +237,9 @@ audiosfx.Alarms.MeltdownDramatic.Alarm1:Play()
 audiosfx.Alarms.UrgentAlarm:Play()
 audiosfx.Alarms.UrgentWarning:Play()
 audiosfx.Announcements.OverloadMeltdown:Play()
+importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CDirectScreen.SurfaceGui.Enabled = false
+importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CDirectScreen.OverloadMeltdown.Enabled = true
+importantfacilityarea.PrimaryReactorArea.ControlRoom.Shutdown.ShutdownScreen.OverloadMeltdown.Enabled = true
 importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.SurfaceGui.Enabled = false
 importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.Countdown.Enabled = true
 task.wait(6)
@@ -247,6 +252,7 @@ for z = 330,0,-1 do
 	ReplicatedStorage.RemotesEvents.GuiEvents.CountdownText:FireAllClients(z)
 	importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.Countdown.Frame.CountdownText.Text = "T-MINUS "..z.." SECONDS"
 	if z == 300 then
+		importantfacilityarea.PrimaryReactorArea.ControlRoom.EvacSigns.Destroyed.Value = true
 		audiosfx.ExplosionSoundEffects.BlewItOut:Play()
 		replicatedstorage.Events.General.WoopShocking:FireAllClients()
 	end
@@ -255,8 +261,6 @@ for z = 330,0,-1 do
 		replicatedstorage.Events.General.WoopShocking:FireAllClients()
 		audiosfx.Alarms.MeltdownDramatic.Alarm1:Stop()
 		unanchor2(core.Lasers.Model1)
-		unanchor2(core.Lasers.Model2)
-		unanchor2(core.Lasers.Model3)
 		local e = Instance.new("Explosion")
 		e.Parent = game.Workspace
 		e.Position = core.Lasers.Model1.Part.Position
@@ -273,9 +277,11 @@ for z = 330,0,-1 do
 		replicatedstorage.Events.General.WoopShocking:FireAllClients()
 		audiosfx.ExplosionSoundEffects.BlewItOut:Play()
 		audiosfx.ExplosionSoundEffects.SparkExp:Play()
+		unanchor2(core.Lasers.Model3)
 	end
 	if z == 190 then
 		audiosfx.ExplosionSoundEffects.BlewItOut:Play()
+		unanchor2(core.Lasers.Model2)
 		replicatedstorage.Events.General.WoopShocking:FireAllClients()
 	end
 	if z == 169 then
@@ -365,20 +371,6 @@ for z = 330,0,-1 do
 		audiosfx.ExplosionSoundEffects.Explosion:Play()
 		replicatedstorage.Events.General.WoopShocking:FireAllClients()
 		replicatedstorage.Events.General.WoopShocking:FireAllClients()
-		unanchor2(core.SpinnerReactorForm1)
-		unanchor2(core.SpinnerReactorForm2)
-		local e = Instance.new("Explosion")
-		e.Parent = game.Workspace
-		e.Position = core.SpinnerReactorForm1.Light.Position
-		e.BlastRadius = 15
-		e.BlastPressure = 15
-		e.ExplosionType = Enum.ExplosionType.NoCraters
-		local e = Instance.new("Explosion")
-		e.Parent = game.Workspace
-		e.Position = core.SpinnerReactorForm2.Light.Position
-		e.BlastRadius = 15
-		e.BlastPressure = 15
-		e.ExplosionType = Enum.ExplosionType.NoCraters
 		wait(1)
 		unanchor2(workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.ControlRoom.StairsGonExplode)
 	end
@@ -413,7 +405,7 @@ for z = 330,0,-1 do
 	end
 	if z == 30 then
 		audiosfx.Alarms.MeltdownDramatic.Alarm5:Play()
-		workspace.Graviity = 185
+		workspace.Gravity = 165
 		audiosfx.Overloadlast60:Play()
 	end
 	if z == 20 then
@@ -426,6 +418,7 @@ for z = 330,0,-1 do
 		fade(self.GeneralMusic.PlanetEradication.Ending,"In")
 	end
 	if z == 6 then
+		importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CDirectScreen.OverloadMeltdown.Enabled = false
 		importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.Countdown.Enabled = false
 		importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.SurfaceGui.Enabled = false
 		importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.Meltdown.Enabled = false
@@ -435,10 +428,13 @@ for z = 330,0,-1 do
 		unanchor2(importantfacilityarea.PrimaryReactorArea.ControlRoom.PrimMonitorCStat)
 		local e = Instance.new("Explosion")
 		e.Parent = game.Workspace
-		e.Position = importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.Positition
+		e.Position = importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.Position
 		e.BlastRadius = 15
 		e.BlastPressure = 35
 		e.ExplosionType = Enum.ExplosionType.NoCraters
+	end
+	if z == 5 then
+		importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.CStat2.Crack:Play()
 	end
 	if z == 3 then
 		audiosfx.Alarms.MeltdownDramatic.Alarm5:Stop()
@@ -488,7 +484,7 @@ fade(self.GeneralMusic.PlanetEradication.Ending,"Out")
 self.PowerEventChamber:Fire("on")
 game.Lighting.OverloadEffect.Enabled = false
 game.Workspace.OverloadExplode:Destroy()
-workspace.Graviity = 196.1
+workspace.Gravity = 196.1
 -- add an ending
 TweenService:Create(workspace.World.Objects.Miscellaneous.LockdownDoorCtrl.Main, TweenInfo.new(0.95, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {CFrame = workspace.World.Objects.Miscellaneous.LockdownDoorCtrl.Open.CFrame}):Play()
 task.wait(1)

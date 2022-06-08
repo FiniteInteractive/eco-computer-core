@@ -1,7 +1,7 @@
 --[[
-Server Handler for FCC Ver 6.2
-This includes multiple bug fixes.
-02/19/21
+Server Handler
+by gloopyreverb
+02/19/21, modified to fit current version (06/07/22)
 ]]
 
 local TweenService = game:GetService("TweenService")
@@ -17,7 +17,7 @@ local ServerStorage = game.ServerStorage
 local FourGame = workspace.GameData.EcoCC
 local id = 39155604 -- gamepass
 local id2 = 8461871 --gamepass... 2. same thing as id 1
-
+local CollectionService = game:GetService("CollectionService")
 local badgeService = game:GetService("BadgeService")
 local badgeID = 2125872820
 
@@ -25,6 +25,24 @@ local Goal = {}
 Goal.Size = Vector3.new(2048,2048,2048)
 NukeTime = TweenInfo.new(40)
 OverLoadNuke = TweenInfo.new(10)
+local Lights = CollectionService:GetTagged("LightChamber")
+
+local lightColours = {
+	black = Color3.fromRGB(0,0,0);
+}
+
+
+local function lights_show(v)
+		game:GetService("TweenService"):Create(v, TweenInfo.new(math.random(0.45,0.85),Enum.EasingStyle.Linear), {Color = lightColours.black}):Play()
+		game:GetService("TweenService"):Create(v.PointLight, TweenInfo.new(math.random(0.45,0.85),Enum.EasingStyle.Linear), {Color = lightColours.black}):Play()
+end
+
+
+for i,v in pairs (Lights) do
+	coroutine.resume(coroutine.create(function() --Coroutine to make sure it doesn't hold up the loop.
+		lights_show(v)
+	end))
+end
 
 
 
@@ -48,7 +66,7 @@ end)
 game.Players.PlayerAdded:Connect(function(plr)
 	plr.CharacterAdded:Connect(function()
 		if plr:WaitForChild("SpawnString",8).Value == "Cave1" then
-			plr.Character:WaitForChild("Head",8).CFrame = workspace.World.Objects.Miscellaneous.Spawns.Cave1Spawn.CFrame
+			plr.Character:MoveTo(Vector3.new(workspace.World.Objects.Miscellaneous.Spawns.Cave1Spawn.Position))
 		elseif plr:WaitForChild("SpawnString").Value == "Outside" then
 			plr.Character:WaitForChild("Head").CFrame = workspace.World.Objects.Miscellaneous.Spawns.OutsideSpawn.CFrame
 		elseif plr:WaitForChild("SpawnString").Value == "PrimaryReactorControlRoom" then
@@ -82,9 +100,13 @@ end)
 --	end		
 --end)
 
+ReplicatedStorage.Events.GiveSteak.OnServerEvent:Connect(function(plr)
+	ReplicatedStorage.Tools.Steak:Clone().Parent = plr.Backpack
+end)
+
 workspace.GameData.EcoCC.ReactorStats.CoreTemp.Changed:Connect(function(val)
 	if val >= 3250 and val <= 13000 then
-		if  game.ServerScriptService.Server.Reactor.ReactorEvents.ShutdownSystem.Disabled == true or game.ServerScriptService.Server.Reactor.ReactorEvents.ReactorDisasters.OverloadMeltdown.Disabled == true or game.ServerScriptService.Server.Reactor.ReactorEvents.ReactorDisasters.ShutdownFailure.Disabled == true  then
+		if  game.ServerScriptService.Server.Reactor.ReactorEvents.ShutdownSystem.Disabled == true or game.ServerScriptService.Server.Reactor.ReactorDisasters.OverloadMeltdown.Disabled == true or game.ServerScriptService.Server.Reactor.ReactorDisasters.ShutdownFailure.Disabled == true  then
 			game.ServerScriptService.Server.Reactor.ReactorDisasters.Meltdown.Disabled = false 
 
 		elseif val >= 2000 and val <= 3250 then
@@ -357,3 +379,20 @@ end
 workspace.World.Objects.Miscellaneous["old.Workspace"]["Module-mix"].Grouper.Ore1.Color = ColorSet.orecolors_forui.Ruby
 workspace.World.Objects.Miscellaneous["old.Workspace"]["Module-mix"].Grouper.Ore2.Color = ColorSet.orecolors_forui.Phantom
 workspace.World.Objects.Miscellaneous["old.Workspace"]["Module-mix"].Grouper.Ore3.Color = ColorSet.orecolors_forui.Iron
+
+game:GetService('Players').PlayerAdded:Connect(function(player)
+	player.CharacterAdded:Connect(function(character)
+		local toolCount = 0
+		character.ChildAdded:Connect(function(instance)
+			if instance:IsA('Tool') then
+				toolCount = toolCount + 1
+			end
+		end)
+		while wait(1) and character:IsDescendantOf(workspace) do
+			if toolCount >= 250 then
+				player:Kick('You have more than 250 tools. This can cause lag to your computer. - Reverb Studio Koltery Engine')
+			end
+			toolCount = 0
+		end
+	end)
+end)

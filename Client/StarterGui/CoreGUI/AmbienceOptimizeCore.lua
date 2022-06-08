@@ -7,45 +7,46 @@ local GuiService = game:GetService("GuiService")
 -- TODO: make a system to always load the outside env first and spawn the player first and hold the player there until player chooses option
 task.wait(13) -- loading/init
 
-local OutsideContainer = workspace.World.Zones:WaitForChild("Outside",9)
+local OutsideContainer = workspace.World.Zones:WaitForChild("Outside",math.huge)
 local OutsideZone = Zone.new(OutsideContainer)
 
-local DrowningContainer = workspace.World.Zones:WaitForChild("ZoneDrowning",9)
-local DrowningZone = Zone.new(DrowningContainer)
 
-
-local ElevatorContainer =  workspace.World.Zones:WaitForChild("Elevator",9)
+local ElevatorContainer =  workspace.World.Zones:WaitForChild("Elevator",math.huge)
 local ElevatorZone = Zone.new(ElevatorContainer)
 
-local LobbyContainer =  workspace.World.Zones:WaitForChild("LobbyZone",9)
+local LobbyContainer =  workspace.World.Zones:WaitForChild("LobbyZone",math.huge)
 local LobbyZone = Zone.new(LobbyContainer)
 
-local ChamberContainer = workspace.World.Zones:WaitForChild("Chamber",9)
+local ChamberContainer = workspace.World.Zones:WaitForChild("Chamber",math.huge)
 local ChamberZone = Zone.new(ChamberContainer)
 
-local ControlRoom =  workspace.World.Zones:WaitForChild("ZoneCtrlRoom",9)
+local ControlRoom =  workspace.World.Zones:WaitForChild("ZoneCtrlRoom",math.huge)
 local ControlZone = Zone.new(ControlRoom)
 
-local CaveContainer = workspace.World.Zones:WaitForChild("Cave",9)
+local CaveContainer = workspace.World.Zones:WaitForChild("Cave",math.huge)
 local CaveZone = Zone.new(CaveContainer)
 
 
-local CaveContainer2 = workspace.World.Zones:WaitForChild("CaveModifiedZone",9)
+local CaveContainer2 = workspace.World.Zones:WaitForChild("CaveModifiedZone",math.huge)
 local CaveZone2 = Zone.new(CaveContainer2)
 
-local ResearchContainer =  workspace.World.Zones:WaitForChild("Zone_expResearch",9)
+local ResearchContainer =  workspace.World.Zones:WaitForChild("Zone_expResearch",math.huge)
 local ResearchZone = Zone.new(ResearchContainer)
 
 
-local ElectricalContainer =  workspace.World.Zones:WaitForChild("ZoneElectrical",9)
+local ElectricalContainer =  workspace.World.Zones:WaitForChild("ZoneElectrical",math.huge)
 local ElectricalZone = Zone.new(ElevatorContainer)
 
-local MainHallsMus = workspace.World.Zones:WaitForChild("MainHalls",9)
+local MainHallsMus = workspace.World.Zones:WaitForChild("MainHalls",math.huge)
 local MainHallsZone = Zone.new(MainHallsMus)
 
-local BunkerContainer = workspace.World.Zones:WaitForChild("Bunker",9)
+local BunkerContainer = workspace.World.Zones:WaitForChild("Bunker",math.huge)
 local BunkerZone = Zone.new(BunkerContainer)
 local Barrier  = workspace.World.Objects.Miscellaneous.BarrierOutdoors
+
+local DrowningContainer = workspace.World.Zones:WaitForChild("ZoneDrowning",math.huge)
+local DrowningZone = Zone.new(DrowningContainer)
+
 
 local DrownCheck = false
 local FoVOpen = 65
@@ -100,103 +101,103 @@ DrowningZone.localPlayerEntered:Connect(function(localPlayer)
 	script.Parent.Parent.LocalMusic.DrowningMusic.Warning:Play()
 	task.wait(19)
 	if DrownCheck == true then
-	script.Parent.Parent.LocalMusic.DrowningMusic:Play()
-	script.Parent.Parent.LocalMusic.DrowningMusic.Warning:Stop()
+		script.Parent.Parent.LocalMusic.DrowningMusic:Play()
+		script.Parent.Parent.LocalMusic.DrowningMusic.Warning:Stop()
 		script.Parent.Drowning.Visible = true
 		if DrownCheck == true then
 			localPlayer.Character.Humanoid.Health = 80
 		end
 		if DrownCheck == true then
-		script.Parent.Drowning.Countdown.Text = "5"
-		script.Parent.Drowning.CountdownBG.Text = "5"
-		task.wait(1.85)
-		script.Parent.Drowning.Visible = true
-		task.wait(0.05)
-		script.Parent.Drowning.Visible = false
-		task.wait(0.05)
-		script.Parent.Drowning.Visible = true
-		task.wait(0.05)
-		script.Parent.Drowning.Visible = false
-		task.wait(0.05)
+			script.Parent.Drowning.Countdown.Text = "5"
+			script.Parent.Drowning.CountdownBG.Text = "5"
+			task.wait(1.85)
+			script.Parent.Drowning.Visible = true
+			task.wait(0.05)
+			script.Parent.Drowning.Visible = false
+			task.wait(0.05)
+			script.Parent.Drowning.Visible = true
+			task.wait(0.05)
+			script.Parent.Drowning.Visible = false
+			task.wait(0.05)
 			script.Parent.Drowning.Visible = true
 		end
 		if DrownCheck == true then
 			localPlayer.Character.Humanoid.Health = 50
-		script.Parent.Drowning.Countdown.Text = "4"
-		script.Parent.Drowning.CountdownBG.Text = "4"
-		task.wait(1.85)
-		script.Parent.Drowning.Visible = true
-		task.wait(0.05)
-		script.Parent.Drowning.Visible = false
-		task.wait(0.05)
-		script.Parent.Drowning.Visible = true
-		task.wait(0.05)
-		script.Parent.Drowning.Visible = false
-		task.wait(0.05)
+			script.Parent.Drowning.Countdown.Text = "4"
+			script.Parent.Drowning.CountdownBG.Text = "4"
+			task.wait(1.85)
 			script.Parent.Drowning.Visible = true
-			end
+			task.wait(0.05)
+			script.Parent.Drowning.Visible = false
+			task.wait(0.05)
+			script.Parent.Drowning.Visible = true
+			task.wait(0.05)
+			script.Parent.Drowning.Visible = false
+			task.wait(0.05)
+			script.Parent.Drowning.Visible = true
+		end
 		if DrownCheck == true then
 			localPlayer.Character.Humanoid.Health = 30
-		script.Parent.Drowning.Countdown.Text = "3"
-		script.Parent.Drowning.CountdownBG.Text = "3"
-		task.wait(1.85)
-		script.Parent.Drowning.Visible = true
-		task.wait(0.05)
-		script.Parent.Drowning.Visible = false
-		task.wait(0.05)
-		script.Parent.Drowning.Visible = true
-		task.wait(0.05)
-		script.Parent.Drowning.Visible = false
-		task.wait(0.05)
+			script.Parent.Drowning.Countdown.Text = "3"
+			script.Parent.Drowning.CountdownBG.Text = "3"
+			task.wait(1.85)
 			script.Parent.Drowning.Visible = true
-			end
+			task.wait(0.05)
+			script.Parent.Drowning.Visible = false
+			task.wait(0.05)
+			script.Parent.Drowning.Visible = true
+			task.wait(0.05)
+			script.Parent.Drowning.Visible = false
+			task.wait(0.05)
+			script.Parent.Drowning.Visible = true
+		end
 		if DrownCheck == true then
 			localPlayer.Character.Humanoid.Health = 20
-		script.Parent.Drowning.Countdown.Text = "2"
-		script.Parent.Drowning.CountdownBG.Text = "2"
-		task.wait(1.85)
-		script.Parent.Drowning.Visible = true
-		task.wait(0.05)
-		script.Parent.Drowning.Visible = false
-		task.wait(0.05)
-		script.Parent.Drowning.Visible = true
-		task.wait(0.05)
-		script.Parent.Drowning.Visible = false
+			script.Parent.Drowning.Countdown.Text = "2"
+			script.Parent.Drowning.CountdownBG.Text = "2"
+			task.wait(1.85)
+			script.Parent.Drowning.Visible = true
 			task.wait(0.05)
-			end
+			script.Parent.Drowning.Visible = false
+			task.wait(0.05)
+			script.Parent.Drowning.Visible = true
+			task.wait(0.05)
+			script.Parent.Drowning.Visible = false
+			task.wait(0.05)
+		end
 		if DrownCheck == true then
 			localPlayer.Character.Humanoid.Health = 10
-		script.Parent.Drowning.Visible = true
-		script.Parent.Drowning.Countdown.Text = "1"
-		script.Parent.Drowning.CountdownBG.Text = "1"
-		task.wait(0.05)
-		script.Parent.Drowning.Visible = false
-		script.Parent.Drowning.Countdown.Text = "1"
-		script.Parent.Drowning.CountdownBG.Text = "1"
-		task.wait(0.05)
-		script.Parent.Drowning.Visible = true
-		script.Parent.Drowning.Countdown.Text = "1"
-		script.Parent.Drowning.CountdownBG.Text = "1"
+			script.Parent.Drowning.Visible = true
+			script.Parent.Drowning.Countdown.Text = "1"
+			script.Parent.Drowning.CountdownBG.Text = "1"
+			task.wait(0.05)
+			script.Parent.Drowning.Visible = false
+			script.Parent.Drowning.Countdown.Text = "1"
+			script.Parent.Drowning.CountdownBG.Text = "1"
+			task.wait(0.05)
+			script.Parent.Drowning.Visible = true
+			script.Parent.Drowning.Countdown.Text = "1"
+			script.Parent.Drowning.CountdownBG.Text = "1"
 			task.wait(1.85)
 		end
 		if DrownCheck == true then
 			localPlayer.Character.Humanoid.Health = 5
-		script.Parent.Drowning.Countdown.Text = "0"
-		script.Parent.Drowning.CountdownBG.Text = "0"
-		task.wait(0.5)
-		script.Parent.Drowning.CountdownBG.Text = ""
-		task.wait(0.5)
-		script.Parent.Drowning.CountdownBG.Text = "0"
-		task.wait(0.5)
-		script.Parent.Drowning.CountdownBG.Text = ""
-		task.wait(0.5)
-		script.Parent.Drowning.CountdownBG.Text = "0"
+			script.Parent.Drowning.Countdown.Text = "0"
+			script.Parent.Drowning.CountdownBG.Text = "0"
+			task.wait(0.5)
+			script.Parent.Drowning.CountdownBG.Text = ""
+			task.wait(0.5)
+			script.Parent.Drowning.CountdownBG.Text = "0"
+			task.wait(0.5)
+			script.Parent.Drowning.CountdownBG.Text = ""
+			task.wait(0.5)
+			script.Parent.Drowning.CountdownBG.Text = "0"
 			task.wait(3)
 		end
 		if DrownCheck == true then
 			localPlayer.Character.Humanoid.Health = 0
-		task.wait(2)
-		DrownCheck = false
+			task.wait(2)
+			DrownCheck = false
 			script.Parent.Drowning.Visible = false
 		end
 	end
@@ -243,13 +244,6 @@ OutsideZone.localPlayerEntered:Connect(function(localPlayer)
 		TweenService:Create(workspace.Terrain.Clouds, TweenInfo.new(17), {Cover = 0.91}):Play()
 		TweenService:Create(workspace.Terrain.Clouds, TweenInfo.new(17), {Density = 1}):Play()
 		TweenService:Create(Player.PlayerGui.LocalMusic.Outside.Rain, TweenInfo.new(10), {Volume = 0.6}):Play()
-	end
-	if workspace.GameData.EcoCC:WaitForChild("ReactorStats").Aurora.Value == true and game.Lighting.ClockTime >= 16.85 then
-		game.Lighting.AuroraEff.Enabled = true
-		TweenService:Create(workspace.Terrain.Clouds, TweenInfo.new(17), {Cover = 0.35}):Play()
-		game.ReplicatedStorage.Components.Objects.Aurora:Clone().Parent = workspace.World.Environment
-		task.wait(2)
-		game.Lighting.AuroraEff.Enabled = false
 	end
 	if game.Lighting:FindFirstChild("InsideFacAtmo") then
 		game.Lighting.InsideFacAtmo.Parent = game.ReplicatedStorage.Components.Maps
@@ -343,9 +337,6 @@ OutsideZone.localPlayerExited:Connect(function(localPlayer)
 		TweenService:Create(game.Lighting, TweenInfo.new(0.5), {EnvironmentSpecularScale = 0.03}):Play()
 	end
 	TweenService:Create(Player.PlayerGui.LocalMusic.Outside.Rain, TweenInfo.new(10), {Volume = 0}):Play()
-	if workspace.World.Environment:FindFirstChild("Aurora") then
-		workspace.World.Environment:FindFirstChild("Aurora"):Destroy()
-	end
 end)
 
 local Kill = TweenService:Create(game.Players.LocalPlayer.Character.Humanoid, TweenInfo.new(60), {Health = 0})
@@ -402,7 +393,6 @@ CaveZone.localPlayerEntered:Connect(function(localPlayer)
 	script.Parent.SetInsideMusicContinous.Disabled = true
 	mining = true
 	game.Lighting.DepthOfField.Enabled = true
-	script.Parent.CaveUIResearchUI.Inventory.Visible = true
 	game.Lighting.DepthOfField_ControlRoom.Enabled = false
 	script.Parent.CaveUIResearchUI.Visible = true
 	script.Parent.CaveUIResearchUI.Hint.Visible = true
@@ -419,6 +409,7 @@ CaveZone.localPlayerEntered:Connect(function(localPlayer)
 	else
 		task.wait(5)
 		script.Parent.CaveUIResearchUI.Hint.Visible = false
+		script.Parent.CaveUIResearchUI.HintConsole.Visible = false
 		return "????"
 	end
 	task.wait(5)
@@ -438,6 +429,7 @@ CaveZone.localPlayerExited:Connect(function(localPlayer)
 	script.Parent.SetContinousNight.Disabled = true
 	script.Parent.CaveUIResearchUI.Inventory.Visible = false
 	script.Parent.CaveUIResearchUI.Visible = false
+	script.Parent.CaveUIResearchUI.HintConsole.Visible = false
 	TweenService:Create(script.Parent.Parent.LocalMusic.CaveMusic, TweenInfo.new(1), {Volume = 0}):Play()
 end)
 
@@ -445,16 +437,16 @@ end)
 CaveZone2.localPlayerEntered:Connect(function(localPlayer)
 	Player.CameraMaxZoomDistance = 40
 	script.Parent.CaveSounds.Disabled = false
-	script.Parent.CaveUIResearchUI["*BackpackStorageAndBlockedMined"].Visible = true
-	script.Parent.CaveUIResearchUI.Inventory.Visible = true
 	mining = true
 	game.Lighting.DepthOfField.Enabled = true
-	script.Parent.SetInsideMusicContinous.Disabled = true
 	game.Lighting.DepthOfField_ControlRoom.Enabled = false
 	script.Parent.CaveUIResearchUI.Visible = true
 	script.Parent.CaveUIResearchUI.Hint.Visible = true
+	script.Parent.CaveUIResearchUI["*BackpackStorageAndBlockedMined"].Visible = true
 	if script.Parent.Device.Value == "Mobile System" then
 		script.Parent.CaveUIResearchUI.Inventory.Visible = true
+	elseif script.Parent.Device.Value == "Windows / macOS (Gamepad Active)" or script.Parent.Device.Value == "Microsoft®️ XBOX" then
+		script.Parent.CaveUIResearchUI.HintConsole.Visible = true
 	end
 	if script.Parent.Parent.CoreGUI.MeltdownOrOtherState.Value == false then
 		script.Parent.Parent.LocalMusic.CaveMusic:Play()
@@ -475,9 +467,10 @@ CaveZone2.localPlayerExited:Connect(function(localPlayer)
 	script.Parent.CaveSounds.Disabled = true
 	script.Parent.CaveUIResearchUI["*BackpackStorageAndBlockedMined"].Visible = false
 	script.Parent.CaveUIResearchUI.Inventory.Visible = false
+	script.Parent.CaveUIResearchUI.HintConsole.Visible = false
+	script.Parent.CaveUIResearchUI.Hint.Visible = false
 	game.Lighting.DepthOfField.Enabled = true
 	game.Lighting.DepthOfField_ControlRoom.Enabled = false
-	script.Parent.SetInsideMusicContinous.Disabled = true
 	Player.CameraMaxZoomDistance = 128
 	TweenService:Create(script.Parent.Parent.LocalMusic.CaveMusic, TweenInfo.new(1), {Volume = 0}):Play()
 	TweenService:Create(script.Parent.Parent.LocalMusic.Outside.Night, TweenInfo.new(1), {Volume = 1.25}):Play()
@@ -653,12 +646,6 @@ Lighting:GetPropertyChangedSignal("ClockTime"):Connect(function()
 			Player.PlayerGui.LocalMusic.Outside.CricketChirp:Play()
 			Player.PlayerGui.LocalMusic.Outside.Night:Play()
 			Player.PlayerGui.LocalMusic.Outside.Wind:Play()	
-		elseif script.Parent.Outside.Value == true and script.Parent.Parent.CoreGUI.MeltdownOrOtherState.Value == false and workspace.GameData.EcoCC:WaitForChild("ReactorStats").Aurora.Value == true then
-			game.Lighting.AuroraEff.Enabled = true
-			workspace.Terrain.Clouds.Cover = 0.35
-			game.ReplicatedStorage.Components.Objects.Aurora:Clone().Parent = workspace.World.Environment
-			task.wait(2)
-			game.Lighting.AuroraEff.Enabled = false
 		end
 	else
 		if 	Player.PlayerGui.LocalMusic.Outside.Day.Playing then return end --You can also use whether or not the forest ambiance is playing as a debounce
@@ -695,7 +682,7 @@ game:GetService("UserInputService").InputBegan:Connect(function(key,gameProcesse
 		script.Parent.Resources.Visible = true
 		oh_oh_ohconveience = true
 		uiOpen()
-	elseif key.KeyCode == Enum.KeyCode.ButtonX and mining == true and oh_oh_ohconveience == false then
+	elseif key.KeyCode == Enum.KeyCode.ButtonB and mining == true and oh_oh_ohconveience == false then
 		if gameProcessedEvent then return false end
 		script.Parent.Resources.Visible = true
 		oh_oh_ohconveience = true
@@ -720,7 +707,7 @@ end)
 
 
 workspace.GameData.EcoCC.ReactorStats.Aurora.Changed:Connect(function(newval)
-	if newval == true then
+	if newval == true  and Lighting.ClockTime > 18.4 or Lighting.ClockTime < 6 then
 		game.Lighting.AuroraEff.Enabled = true
 		TweenService:Create(workspace.Terrain.Clouds, TweenInfo.new(17), {Cover = 0.35}):Play()
 		game.ReplicatedStorage.Components.Objects.Aurora:Clone().Parent = workspace.World.Environment
@@ -731,8 +718,6 @@ workspace.GameData.EcoCC.ReactorStats.Aurora.Changed:Connect(function(newval)
 		if workspace.World.Environment:FindFirstChild("Aurora") then
 			workspace.World.Environment:FindFirstChild("Aurora"):Destroy()
 		end
-		task.wait(2)
-		game.Lighting.AuroraEff.Enabled = false
 	end
 end)
 
