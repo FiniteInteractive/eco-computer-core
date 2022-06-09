@@ -1,5 +1,5 @@
 --[[
-Low Power
+Low Power Startup
 Eco Computer Core, Backend Script
 by gloopyreverb
 ]]
@@ -171,6 +171,7 @@ function corelights()
 	Reactor2.PWRLaserR1.INDI1.Color = Color3.fromRGB(33, 84, 185)
 	Reactor2.PWRLaserR1.INDI2.Color = Color3.fromRGB(33, 84, 185)
 	Reactor2.PWRLaserR1.INDI3.Color = Color3.fromRGB(33, 84, 185)
+	workspace.World.Objects.Facility.Reactor2.ControlRoom.Interactables.ExtractPowerHole.Script.Disabled = false
 	TweenService:Create(Reactor2.PWRLaserR2.INDI1, TweenInfo.new(1), {Color = Color3.fromRGB(33, 84, 185)}):Play()
 	EcoGame.SFX.LightsPower:Play()
 	task.wait(1)
@@ -414,12 +415,15 @@ audiosfx.LaserCharge:Play()
 ReplicatedStorage.RemotesEvents.GuiEvents.Captions:FireAllClients("[Charging]",3)
 wait(0.05)
 core.Core.Reactor1Primary.SpinnerReactor2.Disabled = false
+self.LittleLightsChamber.Script.Disabled = false
 wait(8)
-ReplicatedStorage.RemotesEvents.GuiEvents.Captions:FireAllClients("[Ignited]",4)
+ReplicatedStorage.RemotesEvents.GuiEvents.Captions:FireAllClients("[Igniting]",4)
 audiosfx.CoreNowOn_HighOrLow:Play()
+workspace:SetAttribute("CoreIsOn", true)
 TweenService:Create(game.Lighting.Blur, TweenInfo.new(2), {Size = explosionblur.explosion}):Play()
 ReplicatedStorage.RemotesEvents.GuiEvents.FadeScreen:FireAllClients(Color3.fromRGB(255, 255, 255),2.35)
 wait(1.35)
+self.ReactorStats.CoreTemp.Value = 1
 audiosfx.ReactorChargeAfterStart:Play()
 TweenService:Create(game.Lighting.Blur, TweenInfo.new(5), {Size = explosionblur.normal}):Play()
 core.Core.Reactor1Primary.lIGHT.Active.Enabled = true
@@ -435,6 +439,7 @@ laserprime()
 task.wait(1)
 coreform()
 task.wait(6)
+workspace.GameData.EcoCC.Reactor2Stats.CoreTemp.Script.Disabled = false
 core.Core.Reactor1Primary.Core.Main.RepelScript.Disabled = false
 core.Core.Reactor1Primary.Core.Shield.RepelScript.Disabled = false
 core.Core.Reactor1Primary.Core.Shield2.RepelScript.Disabled = false
@@ -457,6 +462,7 @@ ReplicatedStorage.RemotesEvents.GuiEvents.FadeScreen:FireAllClients(Color3.fromR
 ReplicatedStorage.RemotesEvents.GuiEvents.Cinematic:FireAllClients(false)
 ReplicatedStorage.RemotesEvents.GuiEvents.AddAchievement:FireAllClients("Startup")
 workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.ControlRoom.Screens.CStat2.Log:Fire("Reactor 1 active")
+workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.ControlRoom.Screens.CStat2.Log:Fire("Reactor 2 active")
 notify("Reactors Started","The Primary and Secondary Reactor have sucessfully started!",6)
 wait(2)
 importantfacilityarea.PrimaryReactorArea.ControlRoom.Screens.ScreenStartupModeChooser.SurfaceGui.Idle_Or_ImportantInstruction.dvd_container.CornerHit.Disabled = false
