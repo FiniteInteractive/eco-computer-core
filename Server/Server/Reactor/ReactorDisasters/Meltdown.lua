@@ -1,7 +1,7 @@
 --[[
 Meltdown
 by gloopyreverb
-07/30/2021
+07/30/21
 ]]
 
 -- Libraries
@@ -671,13 +671,6 @@ if self.ReactorStats.ShutD.Value == false then
 		if z == 89 then
 			audiosfx.ExplosionSoundEffects.Rumble:Play()
 		end
-		if z == 88 then
-			audiosfx.OutNoPow3:Play()
-			power("Off")
-			task.wait(0.5)
-			audiosfx.PowerOn:Play()
-			power("Red")
-		end
 		if z == 87 then
 			fade(self.SFX.OccasionalMeltdownAmbience,"Out")
 			ReplicatedStorage.RemotesEvents.GuiEvents.Captions:FireAllClients("[Explosion]",7)
@@ -689,17 +682,17 @@ if self.ReactorStats.ShutD.Value == false then
 			wait(0.2)
 			audiosfx.ExplosionSoundEffects.ElectronicExplosion:Play()
 			audiosfx.ExplosionSoundEffects.Explosion:Play()
-			game.ServerStorage.Misc.RegenModules.debris_roof_ctrl:Clone().Parent = workspace.World.Objects.Facility.Debris
 			replicatedstorage.Events.General.WoopShocking:FireAllClients()
 
 			audiosfx.ExplosionSoundEffects.BlewItOut:Play()
-			game.ServerStorage.Misc.RegenModules.debris_roof_ctrl:Clone().Parent = workspace.World.Objects.Facility.Debris
-			wait(0.01)
 			game.ServerStorage.Misc.FireRoofSpawn:Clone().Parent = workspace.World.Objects.Facility.Debris
 			audiosfx.ExplosionSoundEffects.majorExplosion:Play()
 			audiosfx.Rumbling:Play()
 			audiosfx.ExplosionSoundEffects.SparkExp:Play()
 			audiosfx.ExplosionSoundEffects.ExplosionIdk:Play()
+		end
+		if z == 85 then
+			game.ServerStorage.Misc.RegenModules.debris_roof_ctrl:Clone().Parent = workspace.World.Objects.Facility.Debris
 		end
 		if z == 61 then
 			audiosfx.ExplosionSoundEffects.BlewItOut:Play()
@@ -782,14 +775,4 @@ if self.ReactorStats.ShutD.Value == false then
 	explosionNOW()
 	workspace.World.Objects.Miscellaneous.Nuke2Out.Size = Vector3.new(0,0,0)
 	TweenService:Create(workspace.World.Objects.Miscellaneous.LockdownDoorCtrl.Main, TweenInfo.new(20, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {CFrame = workspace.World.Objects.Miscellaneous.LockdownDoorCtrl.Open.CFrame}):Play()
-
-	-- What exploded and needs to regenerate?
---[[ 
-Roof debris
-bridge collapse
-The entire core
-Control room (includes controls; evacuation sign)
-bunker
-Jets
---]]
 end
