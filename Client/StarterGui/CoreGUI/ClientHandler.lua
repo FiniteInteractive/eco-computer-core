@@ -162,7 +162,7 @@ local Process = false
 -- self-explanatory
 local function loadmaps()
 	if workspace.World:FindFirstChild("Zones") ~= nil then
-	workspace.World.Zones:Destroy()
+		workspace.World.Zones:Destroy()
 	end
 	game.ReplicatedStorage.Components.Objects:WaitForChild("Zones").Parent = workspace.World
 	game.ReplicatedStorage.Components.Maps.MapFacilityDecoration.Parent = workspace.World.Objects.Miscellaneous
@@ -184,7 +184,7 @@ local gamestatecolors =
 	}
 
 
-	-- changes blur effect depending on what area the player is in
+-- changes blur effect depending on what area the player is in
 local explosionblur = {
 	explosion = 18.5;
 	bunkerblurexp = 10.72;
@@ -2325,22 +2325,6 @@ script.Parent.FeatureUpdate.Prompt.Exit.MouseButton1Click:Connect(function()
 			end
 		end
 	end
-end)
-
-
-
-script.Parent.ShareData.Options.Share.MouseButton1Click:Connect(function()
-	game.Lighting.uiBlur.Size = 0
-	script.Parent.Settings.MainContext.Privacy.ShareDataOn.BackgroundColor3 = buttoncolors.enabled
-	script.Parent.Settings.MainContext.Privacy.ShareDataOff.BackgroundColor3 = buttoncolors.disabled
-	game.ReplicatedStorage.Events.PrivacyEvent:FireServer("ShareData",true)
-	script.Parent.ShareData.Visible = false
-end)
-
-script.Parent.ShareData.Options.Deny.MouseButton1Click:Connect(function()
-	game.Lighting.uiBlur.Size = 0
-	game.ReplicatedStorage.Events.PrivacyEvent:FireServer("ShareData",false)
-	script.Parent.ShareData.Visible = false
 end)
 
 
