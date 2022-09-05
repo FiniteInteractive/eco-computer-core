@@ -9,7 +9,18 @@ Code by: Cosmos (@whimsicalcosmos)
 Reverb Studio 2022-2023
 ]]
 
--- Essential Libraries
+--[[
+	GameAnalytics & Privacy
+
+	Reverb Studio takes privacy *very seriously*. We will never tamper, sell or do anything with your gameplay data besides:
+		- improve the experience
+		- help us know errors in a quick and easy way
+
+	To help anonymize this data, we modified the GameAnalytics SDK on the server so all data being sent is anonymized. It will not be tied to you, your User Id, your Display Name or Username.
+	You may notice some events being fired such as "addDesignEvent" or "addErrorEvent". Again, this is to help improve the experience and help us know errors in a quick and easy way.
+
+--]]
+
 
 local LevelImg = {
 	Level0 = {
@@ -117,14 +128,13 @@ local uiColorDecreaseProperties = {
 }
 
 local id = 39155604
-local id2 = 8461871 -- gamepass
+local id2 = 8461871 
 
 local selectedgear = script.Parent.SelectedGear -- fixed.
 
-
-
 local gamestate = workspace:GetAttribute("GameState")
 
+-- returns level data
 if player:WaitForChild("Level",20) == nil then
 	--player:WaitForChild("Level",7)
 	--player.Level:WaitForChild("Experience_Current",7)
@@ -145,30 +155,15 @@ if player:WaitForChild("Level",20) == nil then
 	end)
 end
 
-
-local frames_show_off = {
-	["1"] = "rbxassetid://9205554490";
-	["2"] = "rbxassetid://9205552832";
-	["3"] = "rbxassetid://9205552265";
-	["4"] = "rbxassetid://9205553852";
-	["5"] = "rbxassetid://9205554980";
-	["6"] = "rbxassetid://9205553368";
-	["7"] = "rbxassetid://9205554111";
-}
-
---local function fadethruimages(parent,id)
---	for i = 1,25 do
---		task.wait(.01)
---		parent.ImageTransparency = (1-(0.05*i))
---	end
---	script.Parent.About.InteractionMenu.Video.Image = id
---end
 local un = false
 local Process = false
 
 
+-- self-explanatory
 local function loadmaps()
+	if workspace.World:FindFirstChild("Zones") ~= nil then
 	workspace.World.Zones:Destroy()
+	end
 	game.ReplicatedStorage.Components.Objects:WaitForChild("Zones").Parent = workspace.World
 	game.ReplicatedStorage.Components.Maps.MapFacilityDecoration.Parent = workspace.World.Objects.Miscellaneous
 	game.ReplicatedStorage.Components.Maps.OutsideEnv.Parent = workspace.World.Environment
@@ -181,6 +176,7 @@ local buttoncolors = { -- button colors for stuff
 	disabled = Color3.fromRGB(149, 149, 149);
 	enabled = Color3.fromRGB(57, 100, 255);
 }
+
 local gamestatecolors =
 	{
 		qa = Color3.fromRGB(252, 80, 47);
@@ -188,6 +184,7 @@ local gamestatecolors =
 	}
 
 
+	-- changes blur effect depending on what area the player is in
 local explosionblur = {
 	explosion = 18.5;
 	bunkerblurexp = 10.72;
@@ -199,7 +196,7 @@ local function fixcam() -- fixes camera. duh
 	game.Workspace.CurrentCamera.CameraType = "Custom"
 end
 
-
+-- animation for when the player opens a ui
 local function uiOpen()
 	if script.Parent.IsAnimationsReduced.Value == false then
 		TweenService:Create(game.Workspace.CurrentCamera, TweenInfo.new(0.5), {FieldOfView = FoVOpen}):Play()
@@ -216,6 +213,7 @@ local function uiOpen()
 	end
 end
 
+-- animation for when the player closes a ui
 local function uiClose()
 	if script.Parent.IsAnimationsReduced.Value == false then
 		TweenService:Create(game.Lighting.uiBlur, TweenInfo.new(0), {Size = 0}):Play()
@@ -234,6 +232,7 @@ local function uiClose()
 	end
 end
 
+-- this does nothing lol
 local function settingButtonClick(button,toggle)
 	if toggle == true then
 
@@ -242,6 +241,7 @@ local function settingButtonClick(button,toggle)
 	end	
 end
 
+-- smoothly tweens ui elements
 local function tweeny(frame, transparency)
 	if script.Parent.IsAnimationsReduced.Value == false then
 		TweenService:Create(frame, TweenInfo.new(0.5), {Transparency = transparency}):Play()
@@ -291,6 +291,7 @@ end
 
 loadmaps()
 
+-- sends an event to GameAnalytics
 workspace:GetAttributeChangedSignal("CoreIsOn"):Connect(function()
 	ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addDesignEvent","Core:Startup")
 end)
@@ -308,6 +309,7 @@ script.Parent.CommandWarning.Prompt.InteractionMenu.Choices.Run.MouseButton1Clic
 	script.Parent.CommandWarning.Visible = false
 end)
 
+-- updateonjoin function updates all user data and sets ui positions
 function updateonjoin() -- Updates when player joins the game.
 	print("Updating ReEngine Framework Client")
 	script.Parent.Settings:TweenPosition(UDim2.new(0.147, 0, 0.136, 0))
@@ -322,6 +324,25 @@ function updateonjoin() -- Updates when player joins the game.
 	tweeny(script.Parent.Donate,1)
 	script.Parent.CaveUIResearchUI["*BackpackStorageAndBlockedMined"].Text = "Blocks Mined: "..player:WaitForChild("Blocks").Value
 	player:WaitForChild("Inventory",3)
+	if player.Privacy["ShareData"].Value == true then
+		script.Parent.Settings.MainContext.Privacy.ShareDataOn.BackgroundColor3 = buttoncolors.enabled
+		script.Parent.Settings.MainContext.Privacy.ShareDataOff.BackgroundColor3 = buttoncolors.disabled
+	elseif player.Privacy["ShareData"].Value == false then
+		script.Parent.Settings.MainContext.Privacy.ShareDataOn.BackgroundColor3 = buttoncolors.disabled
+		script.Parent.Settings.MainContext.Privacy.ShareDataOff.BackgroundColor3 = buttoncolors.enabled
+	elseif player.Privacy["ShareFeedbackData"].Value == true then
+		script.Parent.Settings.MainContext.Privacy.FeedbackUserDataOn.BackgroundColor3 = buttoncolors.enabled
+		script.Parent.Settings.MainContext.Privacy.FeedbackUserDataOff.BackgroundColor3 = buttoncolors.disabled
+	elseif player.Privacy["ShareFeedbackData"].Value == false then
+		script.Parent.Settings.MainContext.Privacy.FeedbackUserDataOn.BackgroundColor3 = buttoncolors.disabled
+		script.Parent.Settings.MainContext.Privacy.FeedbackUserDataOff.BackgroundColor3 = buttoncolors.enabled
+	elseif player.Privacy["AdditionalData"].Value == true then
+		script.Parent.Settings.MainContext.Privacy.ShareAdditionalDataOn.BackgroundColor3 = buttoncolors.enabled
+		script.Parent.Settings.MainContext.Privacy.ShareAdditionalDataOff.BackgroundColor3 = buttoncolors.disabled
+	elseif player.Privacy["AdditionalData"].Value == false then
+		script.Parent.Settings.MainContext.Privacy.ShareAdditionalDataOn.BackgroundColor3 = buttoncolors.disabled
+		script.Parent.Settings.MainContext.Privacy.ShareAdditionalDataOff.BackgroundColor3 = buttoncolors.enabled
+	end
 	local Tool = player.Backpack:FindFirstChild("Kangaroo") or player.Character:FindFirstChild("Kangaroo")
 	if Tool then
 		script.Parent.WhichSpell.InteractionMenu.SpellList.Kangaroo.Visible = true
@@ -548,6 +569,7 @@ function teleport(location)
 	end
 end
 
+-- ore images (Deprecated)
 local oresimages = {
 	ruby = "rbxassetid://8058887408";
 	phantom = "rbxassetid://8058887645";
@@ -568,6 +590,7 @@ script.Parent.ButtonMenuFrame.zLevel.MouseButton1Click:Connect(function()
 	script.Parent.Parent.Click:Play()
 	script.Parent.YourLevel.Visible = true
 end)
+
 script.Parent.Resources.InteractionMenu.SubmenuChooser.OresMaterials.MouseButton1Click:Connect(function()
 	script.Parent.Resources["*OreList"].Visible = true
 	script.Parent.Resources["PickMenu"].Visible = false
@@ -594,7 +617,7 @@ end)
 ReplicatedStorage.RemotesEvents.GuiEvents.OtherUiController.OnClientEvent:Connect(function(whatshows,duration)
 	if whatshows == "electricalsystemstartuponly" then
 		script.Parent.ElectricalSystemStartupOnly.Visible = true
-		wait(duration)
+		task.wait(duration)
 		script.Parent.ElectricalSystemStartupOnly.Visible = false
 	elseif whatshows == "SpellList" then
 		script.Parent.WhichSpell.Visible = true
@@ -729,6 +752,8 @@ script.Parent.IsShakeOn.Changed:Connect(function(bool)
 	end
 end)
 
+-- This is a deprecated method of setting the interface to Light or Dark Mode.
+--[[
 script.Parent.Settings.MainContext.Appearance.Dark.MouseButton1Click:Connect(function()
 	script.Parent.Settings.BackgroundColor3 = Colors.dark.settings.windowborder
 	for _, v in pairs(script.Parent.Settings.ActionBar:GetDescendants()) do
@@ -783,11 +808,6 @@ script.Parent.Settings.MainContext.Appearance.Dark.MouseButton1Click:Connect(fun
 	script.Parent.Settings.MainContext.Appearance.Light.Active = true
 end)
 
-
-script.Parent.ButtonMenuFrame.QuestsButton.MouseButton1Click:Connect(function()
-	script.Parent.Quests.Visible = true
-end)
-
 script.Parent.Settings.MainContext.Appearance.Light.MouseButton1Click:Connect(function()
 	script.Parent.Settings.BackgroundColor3 = Colors.light.settings.windowborder
 	for _, v in pairs(script.Parent.Settings.ActionBar:GetDescendants()) do
@@ -839,17 +859,22 @@ script.Parent.Settings.MainContext.Appearance.Light.MouseButton1Click:Connect(fu
 	script.Parent.Settings.MainContext.Appearance.Light.Active = false
 	script.Parent.Settings.MainContext.Appearance.Light.Active = true
 end)
+--]]
 
 script.Parent.About.InteractionMenu.About.VersionExact.Text = "Version "..game.Workspace:GetAttribute("Version")
 
+script.Parent.ButtonMenuFrame.QuestsButton.MouseButton1Click:Connect(function()
+	script.Parent.Quests.Visible = true
+end)
 
+-- turns on Shake and Shake Events
 script.Parent.Settings.MainContext.Accessibility.ShakeOn.MouseButton1Click:Connect(function()
 	script.Parent.Settings.MainContext.Accessibility.ShakeOn.BackgroundColor3 = buttoncolors.enabled
 	script.Parent.Settings.MainContext.Accessibility.ShakeItOff.BackgroundColor3 = buttoncolors.disabled
 	script.Parent.IsShakeOn.Value = true
 end)
 
-
+-- turns off Shake and Shake Events
 script.Parent.Settings.MainContext.Accessibility.ShakeItOff.MouseButton1Click:Connect(function()
 	script.Parent.Settings.MainContext.Accessibility.ShakeItOff.BackgroundColor3 = buttoncolors.enabled
 	script.Parent.Settings.MainContext.Accessibility.ShakeOn.BackgroundColor3 = buttoncolors.disabled
@@ -908,7 +933,9 @@ ReplicatedStorage.Events.General.WeExploded.OnClientEvent:Connect(function()
 end)
 
 
+-- receives cutscene events and fires as expected
 ReplicatedStorage.RemotesEvents.GuiEvents.CutsceneEvent.OnClientEvent:Connect(function(type)
+
 	if type == "StartupCutscene" then
 		player.PlayerScripts.Cutscenes.Startup.Disabled = false
 		script.Parent.Skip.Visible = true
@@ -923,6 +950,8 @@ ReplicatedStorage.RemotesEvents.GuiEvents.CutsceneEvent.OnClientEvent:Connect(fu
 		script.Parent.Skip.Visible = true
 	end
 end)
+
+-- skips cutscenes
 
 script.Parent.Skip.MouseButton1Click:Connect(function()
 	fixcam()
@@ -939,35 +968,6 @@ script.Parent.Skip.MouseButton1Click:Connect(function()
 	starterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack,true)
 	task.wait(2)
 	script.Parent.Cine.Visible = false
-end)
-
-script.Parent.MiniMenu.MouseButton1Click:Connect(function()
-	ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addInformation","Player opened menu")
-	if menu == true then
-		script.Parent.Menu.Visible = true
-		script.Parent.Parent.Click:Play()
-		if UIS.TouchEnabled and not UIS.KeyboardEnabled and not UIS.MouseEnabled
-			and not UIS.GamepadEnabled and not GuiService:IsTenFootInterface() then
-			script.Parent.Menu:TweenPosition(UDim2.new(0.018, 0, 0.433, 0))
-		else
-			script.Parent.Menu:TweenPosition(UDim2.new(0.018, 0, 0.433, 0))
-		end
-		task.wait(0.05)
-		menu = false
-	elseif menu == false then
-		ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addInformation","Player closed menu")
-		script.Parent.Parent.Click:Play()
-		if UIS.TouchEnabled and not UIS.KeyboardEnabled and not UIS.MouseEnabled
-			and not UIS.GamepadEnabled and not GuiService:IsTenFootInterface() then
-			script.Parent.Menu:TweenPosition(UDim2.new(-0.3, 0, 0.399, 0))
-		else
-			script.Parent.Menu:TweenPosition(UDim2.new(-0.31, 0, 0.399, 0))
-		end
-		task.wait(0.05)
-		menu = true
-		task.wait(1.14)
-		script.Parent.Menu.Visible = false
-	end
 end)
 
 script.Parent.ButtonMenuFrame.MenuButton.MouseButton1Click:Connect(function()
@@ -1017,7 +1017,6 @@ ReplicatedStorage.RemotesEvents.GuiEvents.AddFacilityStatus.OnClientEvent:Connec
 		wait(1)
 	end
 end)
-
 
 ReplicatedStorage.RemotesEvents.GuiEvents.Cinematic.OnClientEvent:Connect(function(visible)
 	if visible == true then
@@ -1104,7 +1103,7 @@ script.Parent.HeyHey.InteractionMenu.SpawnChoices.Frame.ControlTheReactor.MouseB
 	player.PlayerScripts.ChoosersPoosers.ExpOutdoors.Disabled = true
 	player.PlayerScripts.ChoosersPoosers.ControlReactors.Disabled = false
 	player.PlayerScripts.ChoosersPoosers.ShowOff.Disabled = true
-	script.Parent.HeyHey.InteractionMenu.ChooseOp.Text = "Control the Reactor"
+	script.Parent.HeyHey.InteractionMenu.ChooseOp.Text = "Control Primary Reactor"
 	player.PlayerScripts.ChoosersPoosers.Trains.Disabled = true
 	TypeOfJob.Value = "Reactor"
 end)
@@ -1116,7 +1115,7 @@ script.Parent.HeyHey.InteractionMenu.SpawnChoices.Frame.ExploreOutdoor.MouseButt
 	player.PlayerScripts.ChoosersPoosers.ControlReactors.Disabled = true
 	player.PlayerScripts.ChoosersPoosers.ShowOff.Disabled = true
 	player.PlayerScripts.ChoosersPoosers.Trains.Disabled = true
-	script.Parent.HeyHey.InteractionMenu.ChooseOp.Text = "Hangout / Explore the Outdoors"
+	script.Parent.HeyHey.InteractionMenu.ChooseOp.Text = "Explore the Outdoors"
 	TypeOfJob.Value = "Outdoors"
 
 end)
@@ -1127,12 +1126,14 @@ script.Parent.HeyHey.InteractionMenu.SpawnChoices.Frame.Trains.MouseButton1Click
 	player.PlayerScripts.ChoosersPoosers.KillMonsters.Disabled = true
 	player.PlayerScripts.ChoosersPoosers.ExpOutdoors.Disabled = true
 	player.PlayerScripts.ChoosersPoosers.ControlReactors.Disabled = true
-	script.Parent.HeyHey.InteractionMenu.ChooseOp.Text = "Trains"
+	script.Parent.HeyHey.InteractionMenu.ChooseOp.Text = "Transit"
 	player.PlayerScripts.ChoosersPoosers.ShowOff.Disabled = false
 	TypeOfJob.Value = "Trains"
 end)
 
 
+-- Of course, there should be a better way to do things in this code. Is it too late?
+-- Anyways - this just helps confirm where the player spawns
 script.Parent.HeyHey.InteractionMenu.ButtonsChoice.Choose.MouseButton1Click:Connect(function()
 	camera.CameraType = Enum.CameraType.Custom
 	script.Parent.OutOfIntro.Value = true
@@ -1172,7 +1173,7 @@ script.Parent.HeyHey.InteractionMenu.ButtonsChoice.Choose.MouseButton1Click:Conn
 end)
 
 
--- then quick spawning
+-- "Quick Spawn" is the internal name for "Set Spawn". This allows players to easily spawn anywhere in the facility.
 
 script.Parent.QuickSpawn.InteractionMenu.SpawnChoices.Frame.MiningOutCreate.MouseButton1Click:Connect(function()
 	script.Parent.QuickSpawn.InteractionMenu.ChooseOp.Text = "Mine Cave #1"
@@ -1239,14 +1240,15 @@ script.Parent.About.InteractionMenu.Exit.MouseButton1Click:Connect(function()
 	script.Parent.About.Visible = false
 end)
 
--- set spawn
+-- Adjust Spawn Location ...
 
 script.Parent.Menu.QuickSpawn.MouseButton1Click:Connect(function()
 	script.Parent.QuickSpawn.Visible = true
 	ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addInformation","Player is adjusting their Spawn Location")
 end)
 
---feedback
+-- opens feedback menu
+
 script.Parent.Menu.Feedback.MouseButton1Click:Connect(function()
 	script.Parent.Feedback.Visible = true
 	ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addInformation","Player is about to send Feedback")
@@ -1254,6 +1256,8 @@ script.Parent.Menu.Feedback.MouseButton1Click:Connect(function()
 	uiOpen()
 	script.Parent.Feedback:TweenPosition(UDim2.new(0.179, 0,0.219, 0),"Out","Quad",0.28)
 end)
+
+-- closes feedback menu, nothing special...
 
 script.Parent.Feedback.InteractionMenu.SendExitChoices.Exit.MouseButton1Click:Connect(function()
 	tweeny(script.Parent.Feedback,1)
@@ -1279,27 +1283,6 @@ script.Parent.Donate.InteractionMenu.Exit.MouseButton1Click:Connect(function()
 	wait(0.3)
 	script.Parent.Donate.Visible = false
 end)
-
-
--- credits
-
-
-
-script.Parent.Menu.Credits.MouseButton1Click:Connect(function()
-	script.Parent.Credits.Visible = true
-	uiOpen()
-	tweeny(script.Parent.Credits,0)
-	script.Parent.Credits:TweenPosition(UDim2.new(0.185, 0,0.136, 0),"Out","Quad",0.28)
-end)
-
-script.Parent.Credits.InteractionMenu.Exit.MouseButton1Click:Connect(function()
-	tweeny(script.Parent.Credits,1)
-	uiClose()
-	script.Parent.Credits:TweenPosition(UDim2.new(0.175, 0,0.230, 0),"Out","Quad",0.28)
-	wait(0.3)
-	script.Parent.Credits.Visible = false
-end)
-
 
 script.Parent.AchievementUIs.CrackOutBombs.InteractionMenu.ExitFrame.Exit.MouseButton1Click:Connect(function()
 	script.Parent.AchievementUIs.CrackOutBombs.Visible = false
@@ -1366,6 +1349,7 @@ end)
 script.Parent.ExitNavigation.MouseButton1Click:Connect(function()
 	navigation(false, nil)
 end)
+
 
 ReplicatedStorage.Events.DisasterClient.OnClientEvent:Connect(function(isonorno)
 	if isonorno == true then
@@ -1797,7 +1781,7 @@ end)
 
 
 
-
+-- still here?
 
 
 ReplicatedStorage.RemotesEvents.GuiEvents.AddAchievement.OnClientEvent:Connect(function(type)
@@ -1818,6 +1802,10 @@ script.Parent.AchievementUIs.JustExploded.InteractionMenu.ExitFrame.Exit.MouseBu
 end)
 
 -- TODO: Redo entire Tutorial System; make it interactive
+-- screw this TODO
+
+
+-- Automatically updates ores on the player-side
 task.wait(1)
 player:WaitForChild("Inventory",3)
 player.Inventory:WaitForChild("Carbon",9).Changed:Connect(function(new: number)
@@ -1828,6 +1816,7 @@ player.Inventory:WaitForChild("Carbon",9).Changed:Connect(function(new: number)
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Carbon.Visible = true
 	end
 end)
+
 player.Inventory:WaitForChild("Coolant",4).Changed:Connect(function(new: number)
 	script.Parent.Resources["*OreList"].Frame.Coolant.Text = new.." Coolant"
 	if new == 0 then
@@ -1836,6 +1825,7 @@ player.Inventory:WaitForChild("Coolant",4).Changed:Connect(function(new: number)
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Coolant.Visible = true
 	end
 end)
+
 player.Inventory:WaitForChild("H2O",3).Changed:Connect(function(new: number)
 	script.Parent.Resources["*OreList"].Frame.H2O.Text = new.." H2O"
 	if new == 0 then
@@ -1844,6 +1834,7 @@ player.Inventory:WaitForChild("H2O",3).Changed:Connect(function(new: number)
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.H2O.Visible = true
 	end
 end)
+
 player.Inventory:WaitForChild("Iron").Changed:Connect(function(new: number)
 	workspace.World.Objects.Miscellaneous:WaitForChild("UnlockedIron").BillboardGui.TextLabel.Text = "Unlocked Iron Pick!"
 	workspace.World.Objects.Miscellaneous:WaitForChild("UnlockedIron2").BillboardGui.TextLabel.Text = "Unlocked Iron Pick!"
@@ -1869,6 +1860,7 @@ player.Inventory:WaitForChild("Oxygen").Changed:Connect(function(new: number)
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Oxygen.Visible = true
 	end
 end)
+
 player.Inventory:WaitForChild("Ruby").Changed:Connect(function(new: number)
 	workspace.World.Objects.Miscellaneous:WaitForChild("UnlockedRuby",2).BillboardGui.TextLabel.Text = "Unlocked Ruby Pick!"
 	workspace.World.Objects.Miscellaneous:WaitForChild("UnlockedRuby2",4).BillboardGui.TextLabel.Text = "Unlocked Ruby Pick!"
@@ -2414,20 +2406,20 @@ ReplicatedStorage.RemotesEvents.GameEvents.Nuclear.OverloadMeltdownEnding.OnClie
 	task.wait(0.5)
 	script.Parent.Parent.LocalMusic.OverloadEnding.Sound4:Play()
 	task.wait(2)
-	script.Parent.OvrldEnding.Text = "everything 8,000 miles away from Edmon[>€3i, Canada was eradicated."
+	script.Parent.OvrldEnding.Text = "everything 8,000 miles away from Edmonton, Canada was eradicated."
 	task.wait(6)
 	script.Parent.OvrldEnding.Text = "it's because..."
 	task.wait(5)
-	script.Parent.OvrldEnding.Text = "...of the shutdown trip."
+	script.Parent.OvrldEnding.Text = "... of that shutdown trip."
 	task.wait(5)
 	script.Parent.OvrldEnding.Text = "nothing was able to be salvaged"
 	task.wait(5)
-	script.Parent.OvrldEnding.Text = "there was no way anyone survived, besides using those jets"
+	script.Parent.OvrldEnding.Text = "There was no way anyone survived, besides using those Jets and Space Travel"
 	task.wait(5)
-	script.Parent.OvrldEnding.Text = "why did you wish for this?"
-	task.wait(7)
-	script.Parent.OvrldEnding.Text = "think about it"
-	task.wait(8)
+	script.Parent.OvrldEnding.Text = "Eclipse Research Insitute, better known as Eco Computer Core was held responible for the damages caused to the Earth."
+	task.wait(11)
+	script.Parent.OvrldEnding.Text = "science is dangerous."
+	task.wait(4)
 	script.Parent.Parent.LocalMusic.OverloadEnding.EndingGlitch:Play()
 	script.Parent.OvrldEnding.Text = "thI m?!it"
 	task.wait(0.2)
@@ -2510,9 +2502,6 @@ script.Parent.Tutorial.Welcome.InteractionMenu.Choices.WhereCaves.MouseButton1Cl
 	script.Parent.Tutorial.Welcome.Visible = false
 end)
 
-
-script.Parent.Menu.UserNotifier.TextLabel.Text = "Hey, "..game.Players.LocalPlayer.DisplayName.."!"
-
 script.Parent.Tutorial.Welcome.Exit.MouseButton1Click:Connect(function()
 	script.Parent.Tutorial.Visible = false
 	if script.Parent.Parent:FindFirstChild("Intro") then
@@ -2558,9 +2547,6 @@ script.Parent.Tutorial.EarnEco.Exit.MouseButton1Click:Connect(function()
 	script.Parent.Tutorial.Welcome.Visible = true
 end)
 
-script.Parent.NoHazmat.HazmatAdvise.InteractionMenu.ExitFrame.Ok.MouseButton1Click:Connect(function()
-	script.Parent.NoHazmat.Visible = false
-end)
 
 
 script.Parent.SecretMarketUI.MainContext.Gear.ItemDescription.Buy.MouseButton1Click:Connect(function()
@@ -2632,44 +2618,7 @@ script.Parent.Quests.QuestLog.ExitFrame.rBack.MouseButton1Click:Connect(function
 	script.Parent.Quests.QuestLog.Visible = false
 end)
 
---local kickIf = false
 
---game.Players.LocalPlayer.Idled:Connect(function(time)
---	script.Parent.AFK.Visible = false
---	script.Parent.AFK:TweenPosition(UDim2.new(0.147, 0, 0.136, 0),"Out","Quad",0.28)
---	task.wait(60)
---	kickIf = true
---	script.Parent.Parent.Alert:Play()
---	script.Parent.Parent.Alert.TimePosition = 0.5
---	script.Parent.AFK.Visible = true
---	tweeny(script.Parent.AFK,0)
---	script.Parent.AFK:TweenPosition(UDim2.new(0.147, 0, 0.13, 0),"Out","Quad",0.28)
---	game:GetService("TweenService"):Create(game.Lighting.uiblur,TweenInfo.new(0.35),{Size = 64}):Play()
---	task.wait(550)
---	if kickIf == true then
---		game.Players.LocalPlayer:Kick("Disconnected for being idle")
---	end
---	script.Parent.AFK.Prompt.InteractionMenu.Choices.Okay.MouseButton1Click:Connect(function()
---		kickIf = false
---		script.Parent.AFK:TweenPosition(UDim2.new(0.147, 0, 0.136, 0),"Out","Quad",0.28)
---		tweeny(script.Parent.AFK,1)
---		game:GetService("TweenService"):Create(game.Lighting.uiblur,TweenInfo.new(0.35),{Size = 0}):Play()
---		task.wait(0.3)
---		script.Parent.AFK.Visible = false
---	end)
---	script.Parent.AFK.Prompt.InteractionMenu.Choices.Discon.MouseButton1Click:Connect(function()
---		kickIf = false
---		script.Parent.AFK:TweenPosition(UDim2.new(0.147, 0, 0.136, 0),"Out","Quad",0.28)
---		tweeny(script.Parent.AFK,1)
---		game:GetService("TweenService"):Create(game.Lighting.uiblur,TweenInfo.new(0.35),{Size = 0}):Play()
---		task.wait(0.3)
---		script.Parent.AFK.Visible = false
---		game.Players.LocalPlayer:Kick("No reason provided.")
---	end)
---end)
-
-
-updateonjoin()
 
 if player:FindFirstChild("Backpack") ~= nil then
 	player.Backpack.Changed:Connect(function()
@@ -2696,6 +2645,7 @@ if player:FindFirstChild("Backpack") ~= nil then
 	end)
 end
 
+-- opens "SellOres"..
 workspace:WaitForChild("ShopProx2",9).ProximityPrompt.Triggered:Connect(function()
 	uiOpen()
 	script.Parent.SellOres.Visible = true
@@ -2706,6 +2656,7 @@ workspace:WaitForChild("ShopProx3",9).ProximityPrompt.Triggered:Connect(function
 	script.Parent.SellOres.Visible = true
 end)
 
+-- This is used to fail and stop transacation after a timeout
 local Process = false
 
 script.Parent.ShopUI.AreYouSure.Processsing:GetPropertyChangedSignal("Visible"):Connect(function(property)
@@ -2722,22 +2673,7 @@ script.Parent.ShopUI.AreYouSure.Processsing:GetPropertyChangedSignal("Visible"):
 	end
 end)
 
-if player.Privacy["ShareData"].Value == true then
-	script.Parent.Settings.MainContext.Privacy.ShareDataOn.BackgroundColor3 = buttoncolors.enabled
-	script.Parent.Settings.MainContext.Privacy.ShareDataOff.BackgroundColor3 = buttoncolors.disabled
-elseif player.Privacy["ShareData"].Value == false then
-	script.Parent.Settings.MainContext.Privacy.ShareDataOn.BackgroundColor3 = buttoncolors.disabled
-	script.Parent.Settings.MainContext.Privacy.ShareDataOff.BackgroundColor3 = buttoncolors.enabled
-elseif player.Privacy["ShareFeedbackData"].Value == true then
-	script.Parent.Settings.MainContext.Privacy.FeedbackUserDataOn.BackgroundColor3 = buttoncolors.enabled
-	script.Parent.Settings.MainContext.Privacy.FeedbackUserDataOff.BackgroundColor3 = buttoncolors.disabled
-elseif player.Privacy["ShareFeedbackData"].Value == false then
-	script.Parent.Settings.MainContext.Privacy.FeedbackUserDataOn.BackgroundColor3 = buttoncolors.disabled
-	script.Parent.Settings.MainContext.Privacy.FeedbackUserDataOff.BackgroundColor3 = buttoncolors.enabled
-elseif player.Privacy["AdditionalData"].Value == true then
-	script.Parent.Settings.MainContext.Privacy.ShareAdditionalDataOn.BackgroundColor3 = buttoncolors.enabled
-	script.Parent.Settings.MainContext.Privacy.ShareAdditionalDataOff.BackgroundColor3 = buttoncolors.disabled
-elseif player.Privacy["AdditionalData"].Value == false then
-	script.Parent.Settings.MainContext.Privacy.ShareAdditionalDataOn.BackgroundColor3 = buttoncolors.disabled
-	script.Parent.Settings.MainContext.Privacy.ShareAdditionalDataOff.BackgroundColor3 = buttoncolors.enabled
-end
+
+updateonjoin()
+
+-- thank god
