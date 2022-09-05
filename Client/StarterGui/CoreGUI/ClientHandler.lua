@@ -1,28 +1,56 @@
+--!strict
+
 --[[
-Eco Computer Core Version 8
+Eco Computer Core Version 8.3
 Script: Client Handler
 Purpose: Handles most client infrastructure
-Code by: Cosmos (@gloopyreverb)
+Code by: Cosmos (@whimsicalcosmos)
 
 Reverb Studio 2022-2023
 ]]
 
+-- Essential Libraries
+
+local LevelImg = {
+	Level0 = {
+		Image = "rbxassetid://9148743171",
+		AltText = "",
+	},
+	Level1to4 = {
+		Image = "rbxassetid://9148743931",
+		AltText = "",
+	},
+	Level4to8 = {
+		Image = "rbxassetid://9148743687",
+		AltText = "",
+	},
+	Level9orMore = {
+		Image = "rbxassetid://9148742758",
+		AltText = "",
+	},
+
+}
+
+
 -- Libraries
 local Players = game:GetService("Players")
 local ts = game:GetService("TeleportService") --Gather the game service=
-local CoreGUI = script.Parent
-local ChatService = game:GetService("Chat")
-local camera = workspace.CurrentCamera
-local CoreGUIModule = require(script.Parent.CoreGUIModule)
-local Colors = require(script.Parent.UIColors)
-local CleanupPerformance = require(game.ReplicatedStorage.Modules.PercleanModule)
+local SoundService = game.SoundService
 local UIS = game:GetService("UserInputService")
 local GuiService = game:GetService("GuiService")
-local main = script
+local ChatService = game:GetService("Chat")
 local starterGui = game:GetService('StarterGui')
 local SocialService = game:GetService("SocialService")
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game.ReplicatedStorage
+
+local CoreGUI = script.Parent
+local camera = workspace.CurrentCamera
+local CoreGUIModule = require(script.Parent.CoreGUIModule)
+local Colors = require(script.Parent.UIColors)
+
+local main = script
+
 local CameraShaker = require(ReplicatedStorage.Modules.CameraShaker)
 local camera = workspace.CurrentCamera
 local Combinations = require(ReplicatedStorage.Lib.ForgeCombine)
@@ -30,9 +58,10 @@ local Humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
 local player = Players.LocalPlayer
 local PurchaseEvent = game.ReplicatedStorage.RemotesEvents.Shop.PurchaseEvent
 local navigate = workspace.World.Objects.Facility:WaitForChild("Navigate")
-local SoundService = game.SoundService
-local LevelImages = require(script.Parent.LevelImages)
-local LevelQuotes = require(script.Parent.LevelQuotes)
+
+local LevelImages = LevelImg
+local LevelQuotes = require(script.Parent.LevelQuotes:Clone())
+
 local menu = true
 local blurwhenui_ison = 24
 local FoVOpen = 65
@@ -40,10 +69,12 @@ local FoVClose = 70
 local vent = true
 local level_notload = false
 local blur = game.Lighting.uiBlur
-serveraudiosfx = workspace.GameData.EcoCC.SFX
+local serveraudiosfx = workspace.GameData.EcoCC.SFX
 local tweenNerd = require(script.Parent.CoreGUIModule)
 local TweenService = game:GetService("TweenService")
 local TypeOfJob = script.Parent.TypeOfJob
+local GameAnalytics = require(ReplicatedStorage.GameAnalytics)
+
 
 
 task.wait(7.86) -- server backend has changed
@@ -87,13 +118,14 @@ local uiColorDecreaseProperties = {
 
 local id = 39155604
 local id2 = 8461871 -- gamepass
+
 local selectedgear = script.Parent.SelectedGear -- fixed.
 
 
 
 local gamestate = workspace:GetAttribute("GameState")
 
-if player:FindFirstChild("Level") == nil then
+if player:WaitForChild("Level",20) == nil then
 	--player:WaitForChild("Level",7)
 	--player.Level:WaitForChild("Experience_Current",7)
 	--player.Level:WaitForChild("Experience_Max",7)
@@ -103,8 +135,10 @@ if player:FindFirstChild("Level") == nil then
 		player.Level:WaitForChild("Experience_Max",15)
 		level_notload = false
 		print("Level Data loaded.")
+		ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addInformation","Player data has loaded")
 	end, function() -- 1
-		script.Parent.SmthWrong.Prompt.InteractionMenu.ErrorMsg.Text = "We could not load one or more of your data. Gameplay will continue without your data saving. Please report this issue to us."
+		ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addError","Unable to load data for this player")
+		script.Parent.SmthWrong.Prompt.InteractionMenu.ErrorMsg.Text = "We could not load one or more of your data. Gameplay will continue without your data saving. Please report this issue to us, or rejoin."
 		script.Parent.SmthWrong.Visible = true
 		level_notload = true
 		warn("Something went wrong for Experience_Current and Experience_Max and 'Level'")
@@ -130,6 +164,8 @@ local frames_show_off = {
 --	script.Parent.About.InteractionMenu.Video.Image = id
 --end
 local un = false
+local Process = false
+
 
 local function loadmaps()
 	workspace.World.Zones:Destroy()
@@ -139,32 +175,7 @@ local function loadmaps()
 	game.ReplicatedStorage.Components.Maps.Lobby.Parent = workspace.World.Objects.Facility.Sector1M
 end
 
---local function playvideo()
---	un = false
---	task.spawn(function()
---		repeat
---			fadethruimages(script.Parent.About.InteractionMenu.Video,frames_show_off["1"])
---			task.wait(2)
---			fadethruimages(script.Parent.About.InteractionMenu.Video,frames_show_off["2"])
---			task.wait(1.95)
---			fadethruimages(script.Parent.About.InteractionMenu.Video,frames_show_off["3"])
---			task.wait(2)
---			fadethruimages(script.Parent.About.InteractionMenu.Video,frames_show_off["4"])
---			task.wait(1.95)
---			fadethruimages(script.Parent.About.InteractionMenu.Video,frames_show_off["5"])
---			task.wait(1.95)
---			fadethruimages(script.Parent.About.InteractionMenu.Video,frames_show_off["6"])
---			task.wait(1.95)
---			fadethruimages(script.Parent.About.InteractionMenu.Video,frames_show_off["7"])
---			task.wait(3.5)
---		until un == true
---	end)
---end
 
---local function stopvideo()
---	un = true
---	script.Parent.About.InteractionMenu.Video.Image = "rbxassetid://9205554490"
---end
 
 local buttoncolors = { -- button colors for stuff
 	disabled = Color3.fromRGB(149, 149, 149);
@@ -176,11 +187,6 @@ local gamestatecolors =
 		internal = Color3.fromRGB(255, 167, 25)
 	}
 
-local bombdecoderplaces = {
-	qatest = 8075262451;
-	internal =  000;
-	stable = 8055069420;
-}
 
 local explosionblur = {
 	explosion = 18.5;
@@ -197,14 +203,12 @@ end
 local function uiOpen()
 	if script.Parent.IsAnimationsReduced.Value == false then
 		TweenService:Create(game.Workspace.CurrentCamera, TweenInfo.new(0.5), {FieldOfView = FoVOpen}):Play()
-		TweenService:Create(game.Lighting.uiBlur, TweenInfo.new(0.5), {Size = blurwhenui_ison}):Play()
 		TweenService:Create(game.Lighting.uiColor_Decrease, TweenInfo.new(0.5), {Brightness = uiColorDecreaseProperties.Brightness}):Play()
 		TweenService:Create(game.Lighting.uiColor_Decrease, TweenInfo.new(0.5), {Contrast = uiColorDecreaseProperties.Contrast}):Play()
 		TweenService:Create(game.Lighting.uiColor_Decrease, TweenInfo.new(0.5), {Saturation = uiColorDecreaseProperties.Saturation}):Play()
 		TweenService:Create(game.Lighting.uiColor_Decrease, TweenInfo.new(0.5), {TintColor = uiColorDecreaseProperties.TintColor}):Play()
 	elseif script.Parent.IsAnimationsReduced.Value == true then
 		TweenService:Create(game.Workspace.CurrentCamera, TweenInfo.new(0), {FieldOfView = FoVOpen}):Play()
-		TweenService:Create(game.Lighting.uiBlur, TweenInfo.new(0), {Size = blurwhenui_ison}):Play()
 		TweenService:Create(game.Lighting.uiColor_Decrease, TweenInfo.new(0), {Brightness = uiColorDecreaseProperties.Brightness}):Play()
 		TweenService:Create(game.Lighting.uiColor_Decrease, TweenInfo.new(0), {Contrast = uiColorDecreaseProperties.Contrast}):Play()
 		TweenService:Create(game.Lighting.uiColor_Decrease, TweenInfo.new(0), {Saturation = uiColorDecreaseProperties.Saturation}):Play()
@@ -214,8 +218,8 @@ end
 
 local function uiClose()
 	if script.Parent.IsAnimationsReduced.Value == false then
+		TweenService:Create(game.Lighting.uiBlur, TweenInfo.new(0), {Size = 0}):Play()
 		TweenService:Create(game.Workspace.CurrentCamera, TweenInfo.new(0.5), {FieldOfView = FoVClose}):Play()
-		TweenService:Create(game.Lighting.uiBlur, TweenInfo.new(0.5), {Size = 0}):Play()
 		TweenService:Create(game.Lighting.uiColor_Decrease, TweenInfo.new(0.5), {Brightness = uiColorDecreaseProperties.ResetBrightness}):Play()
 		TweenService:Create(game.Lighting.uiColor_Decrease, TweenInfo.new(0.5), {Contrast = uiColorDecreaseProperties.ResetContrast}):Play()
 		TweenService:Create(game.Lighting.uiColor_Decrease, TweenInfo.new(0.5), {Saturation = uiColorDecreaseProperties.ResetSaturation}):Play()
@@ -228,6 +232,14 @@ local function uiClose()
 		TweenService:Create(game.Lighting.uiColor_Decrease, TweenInfo.new(0), {Saturation = uiColorDecreaseProperties.ResetSaturation}):Play()
 		TweenService:Create(game.Lighting.uiColor_Decrease, TweenInfo.new(0), {TintColor = uiColorDecreaseProperties.ResetTintColor}):Play()
 	end
+end
+
+local function settingButtonClick(button,toggle)
+	if toggle == true then
+
+	elseif toggle == false then
+
+	end	
 end
 
 local function tweeny(frame, transparency)
@@ -246,6 +258,8 @@ local function tweeny(frame, transparency)
 					TweenService:Create(v, TweenInfo.new(0.5), {BackgroundTransparency = transparency}):Play()
 				elseif v:IsA("Frame") and v.Name == "Settings" then
 					TweenService:Create(v, TweenInfo.new(0.5), {BackgroundTransparency = 0.5}):Play()
+				elseif v:IsA("Frame") and v.Name == "About" then
+					TweenService:Create(v, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
 				end	
 			end
 		end
@@ -262,6 +276,10 @@ local function tweeny(frame, transparency)
 				elseif v:IsA("TextButton") then
 					TweenService:Create(v, TweenInfo.new(0), {TextTransparency = transparency}):Play()
 					TweenService:Create(v, TweenInfo.new(0), {BackgroundTransparency = transparency}):Play()
+				elseif v:IsA("Frame") and v.Name == "Settings" then
+					TweenService:Create(v, TweenInfo.new(0), {BackgroundTransparency = 0.5}):Play()
+				elseif v:IsA("Frame") and v.Name == "About" then
+					TweenService:Create(v, TweenInfo.new(0), {BackgroundTransparency = 1}):Play()
 				end	
 			end
 		end
@@ -272,6 +290,11 @@ end
 
 
 loadmaps()
+
+workspace:GetAttributeChangedSignal("CoreIsOn"):Connect(function()
+	ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addDesignEvent","Core:Startup")
+end)
+
 
 script.Parent.CommandProhibited.Prompt.InteractionMenu.Choices.Okay.MouseButton1Click:Connect(function()
 	script.Parent.CommandProhibited.Visible = false
@@ -299,6 +322,26 @@ function updateonjoin() -- Updates when player joins the game.
 	tweeny(script.Parent.Donate,1)
 	script.Parent.CaveUIResearchUI["*BackpackStorageAndBlockedMined"].Text = "Blocks Mined: "..player:WaitForChild("Blocks").Value
 	player:WaitForChild("Inventory",3)
+	local Tool = player.Backpack:FindFirstChild("Kangaroo") or player.Character:FindFirstChild("Kangaroo")
+	if Tool then
+		script.Parent.WhichSpell.InteractionMenu.SpellList.Kangaroo.Visible = true
+	else
+		script.Parent.WhichSpell.InteractionMenu.SpellList.Kangaroo.Visible = false
+	end
+
+	local Tool2 = player.Backpack:FindFirstChild("Swiftness") or player.Character:FindFirstChild("Swiftness")
+	if Tool2 then
+		script.Parent.WhichSpell.InteractionMenu.SpellList.Swiftness.Visible = true
+	else
+		script.Parent.WhichSpell.InteractionMenu.SpellList.Swiftness.Visible = false
+	end
+
+	local Tool3 = player.Backpack:FindFirstChild("SpellOfHeat") or player.Character:FindFirstChild("SpellOfHeat")
+	if Tool3 then
+		script.Parent.WhichSpell.InteractionMenu.SpellList.SpellOfHeat.Visible = true
+	else
+		script.Parent.WhichSpell.InteractionMenu.SpellList.SpellOfHeat.Visible = false
+	end
 	if (MarketplaceService:UserOwnsGamePassAsync(player.UserId, id2)) or (MarketplaceService:UserOwnsGamePassAsync(player.UserId, id)) then
 		script.Parent.Settings.MainContext.Others.InsRespawnOff.Visible = true
 		script.Parent.Settings.MainContext.Others.InsRespawnOn.Visible = true
@@ -318,13 +361,9 @@ function updateonjoin() -- Updates when player joins the game.
 	end
 	script.Parent.Resources["*OreList"].Frame.Iron.Text = player.Inventory.Iron.Value.." Iron"
 	if player.Inventory.Iron.Value == 0 then
-		script.Parent.RepairPickMenu.ResourcesMenu.InteractionMenu.Frame["Iron Pick"].Visible = false
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Iron.Visible = false
 	elseif player.Inventory.Iron.Value >= 1 then
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Iron.Visible = true
-		script.Parent.RepairPickMenu.ResourcesMenu.InteractionMenu.Frame["Iron Pick"].Visible = false
-	elseif player.Inventory.Iron.Value >= 5 and not player.player.Inventory.Iron.Value <= 4 then
-		script.Parent.RepairPickMenu.ResourcesMenu.InteractionMenu.Frame["Iron Pick"].Visible = true
 	end
 	script.Parent.Resources["*OreList"].Frame.Oxygen.Text = player.Inventory.Oxygen.Value.." Oxygen"
 	if player.Inventory.Oxygen.Value == 0 then
@@ -339,7 +378,7 @@ function updateonjoin() -- Updates when player joins the game.
 		script.Parent.RepairPickMenu.ResourcesMenu.InteractionMenu.Frame["Ruby Pick"].Visible = false
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Ruby.Visible = true
 		script.Parent.RepairPickMenu.ResourcesMenu.InteractionMenu.Frame["Ruby Pick"].Visible = false
-	elseif player.Inventory.Ruby.Value >= 10 and not player.player.Inventory.Ruby.Value <= 9 then
+	elseif (player.Inventory.Ruby.Value >= 10) and not (player.player.Inventory.Ruby.Value <= 9) then
 		script.Parent.RepairPickMenu.ResourcesMenu.InteractionMenu.Frame["Ruby Pick"].Visible = true
 	end
 	script.Parent.Resources["*OreList"].Frame.Phantom.Text = player.Inventory.Phantom.Value.." Phantom"
@@ -347,8 +386,6 @@ function updateonjoin() -- Updates when player joins the game.
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Phantom.Visible = false
 	elseif player.Inventory.Phantom.Value >= 1 then
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Phantom.Visible = true
-	elseif player.Inventory.Phantom.Value >= 10 and not player.player.Inventory.Phantom.Value <= 9 then
-		script.Parent.RepairPickMenu.ResourcesMenu.InteractionMenu.Frame["Phantom Pick"].Visible = true
 	end
 	script.Parent.Resources["*OreList"].Frame.Hydrogen.Text = player.Inventory.Hydrogen.Value.." Hydrogen"
 	if player.Inventory.Hydrogen.Value == 0 then
@@ -417,11 +454,6 @@ function updateonjoin() -- Updates when player joins the game.
 			if workspace.AreaBlockOff:WaitForChild("BlockOff_CTRLR_Lvl4",3)  then
 				workspace.AreaBlockOff.BlockOff_CTRLR_Lvl4:Destroy()
 			end
-		elseif player.Level.Value >= 2 then
-			if workspace.AreaBlockOff:WaitForChild("BlockOff_CTRLR_Lvl2",3)  then
-				workspace.AreaBlockOff.BlockOff_CTRLR_Lvl2:Destroy()
-				workspace.AreaBlockOff.BlockOff_CTRLR_Lvl4:Destroy()
-			end
 		elseif player.Level.Value >= 1 and player.Level.Value <= 4 then
 			script.Parent.YourLevel.MainContext.LevelContex.LevelCartoonImage.Image = LevelImages.Level1to4.Image
 			script.Parent.YourLevel.MainContext.LevelContex.LevelQuote.Text = LevelQuotes[2]
@@ -438,6 +470,7 @@ function updateonjoin() -- Updates when player joins the game.
 		script.Parent.Level.Text = "Level "..player.Level.Value
 		script.Parent.YourLevel.MainContext.LevelContex.Level.Text = "Level "..player.Level.Value
 	end
+
 end
 if gamestate == 1 then
 	script.Parent.statelabel1.Visible = false
@@ -525,6 +558,16 @@ local oresimages = {
 --area change, ambience
 --remote events and module scripts plus ambient changes things
 
+
+script.Parent.YourLevel.Exit.MouseButton1Click:Connect(function()
+	script.Parent.Parent.Click:Play()
+	script.Parent.YourLevel.Visible = false
+end)
+
+script.Parent.ButtonMenuFrame.zLevel.MouseButton1Click:Connect(function()
+	script.Parent.Parent.Click:Play()
+	script.Parent.YourLevel.Visible = true
+end)
 script.Parent.Resources.InteractionMenu.SubmenuChooser.OresMaterials.MouseButton1Click:Connect(function()
 	script.Parent.Resources["*OreList"].Visible = true
 	script.Parent.Resources["PickMenu"].Visible = false
@@ -553,16 +596,92 @@ ReplicatedStorage.RemotesEvents.GuiEvents.OtherUiController.OnClientEvent:Connec
 		script.Parent.ElectricalSystemStartupOnly.Visible = true
 		wait(duration)
 		script.Parent.ElectricalSystemStartupOnly.Visible = false
+	elseif whatshows == "SpellList" then
+		script.Parent.WhichSpell.Visible = true
+	elseif whatshows == "Kangaroo" then
+		script.Parent.WhichSpell.InteractionMenu.SpellList.Kangaroo.Visible = true
+	elseif whatshows == "Swiftness" then
+		script.Parent.WhichSpell.InteractionMenu.SpellList.Swiftness.Visible = true
 	end
 end)
+
+local debounceSpellConf = true
+
+script.Parent.WhichSpell.Exit.MouseButton1Click:Connect(function()
+	script.Parent.WhichSpell.Visible = false
+end)
+
+local Tool = player.Backpack:FindFirstChild("Kangaroo") or player.Character:FindFirstChild("Kangaroo")
+if Tool then
+	script.Parent.WhichSpell.InteractionMenu.SpellList.Kangaroo.Visible = true
+else
+	script.Parent.WhichSpell.InteractionMenu.SpellList.Kangaroo.Visible = false
+end
+
+local Tool2 = player.Backpack:FindFirstChild("Swiftness") or player.Character:FindFirstChild("Swiftness")
+if Tool2 then
+	script.Parent.WhichSpell.InteractionMenu.SpellList.Swiftness.Visible = true
+else
+	script.Parent.WhichSpell.InteractionMenu.SpellList.Swiftness.Visible = false
+end
+
+local Tool3 = player.Backpack:FindFirstChild("SpellOfHeat") or player.Character:FindFirstChild("SpellOfHeat")
+if Tool3 then
+	script.Parent.WhichSpell.InteractionMenu.SpellList.SpellOfHeat.Visible = true
+else
+	script.Parent.WhichSpell.InteractionMenu.SpellList.SpellOfHeat.Visible = false
+end
+
+script.Parent.WhichSpell.InteractionMenu.Confirm.MouseButton1Click:Connect(function()
+	script.Parent.WhichSpell.InteractionMenu.Confirm.Text = "Inserting..."
+	script.Parent.WhichSpell.InteractionMenu.Confirm.BackgroundColor3 = Color3.fromRGB(76, 76, 76)
+	script.Parent.WhichSpell.InteractionMenu.Confirm.TextColor3 = Color3.fromRGB(255, 255, 255)
+	if debounceSpellConf == true and script.Parent.SelectedSpell.Value ~= "None" then
+		debounceSpellConf = false
+		ReplicatedStorage.RemotesEvents.GameEvents.Nuclear.ReactorSpellInsert:FireServer(script.Parent.SelectedSpell.Value)
+		task.wait(math.random(1,2.5))
+		script.Parent.WhichSpell.InteractionMenu.Confirm.Text = "Inserted!"
+		task.wait(3)
+		script.Parent.SelectedSpell.Value = "None"
+		debounceSpellConf = true
+		script.Parent.WhichSpell.InteractionMenu.Confirm.Text = "Insert"
+		script.Parent.WhichSpell.InteractionMenu.Confirm.TextColor3 = Color3.fromRGB(0, 0, 0)
+		script.Parent.WhichSpell.InteractionMenu.Confirm.BackgroundColor3 = Color3.fromRGB(39, 255, 155)
+	elseif debounceSpellConf == true and script.Parent.SelectedSpell.Value == "None" then
+		debounceSpellConf = false
+		script.Parent.WhichSpell.InteractionMenu.Confirm.BackgroundColor3 = Color3.fromRGB(244, 35, 35)
+		script.Parent.WhichSpell.InteractionMenu.Confirm.TextColor3 = Color3.fromRGB(0, 0, 0)
+		script.Parent.WhichSpell.InteractionMenu.Confirm.Text = "No Spell Selected"
+		task.wait(3)
+		script.Parent.SelectedSpell.Value = "None"
+		debounceSpellConf = true
+		script.Parent.WhichSpell.InteractionMenu.Confirm.Text = "Insert"
+		script.Parent.WhichSpell.InteractionMenu.Confirm.BackgroundColor3 = Color3.fromRGB(39, 255, 155)
+	end
+end)
+
+script.Parent.WhichSpell.InteractionMenu.SpellList.MouseButton1Click:Connect(function()
+	script.Parent.SelectedSpell.Value = "None"
+end)
+
+script.Parent.WhichSpell.InteractionMenu.SpellList.Kangaroo.MouseButton1Click:Connect(function()
+	script.Parent.SelectedSpell.Value = "Kangaroo"
+end)
+
+script.Parent.WhichSpell.InteractionMenu.SpellList.SpellOfHeat.MouseButton1Click:Connect(function()
+	script.Parent.SelectedSpell.Value = "SpellOfHeat"
+end)
+
+script.Parent.WhichSpell.InteractionMenu.SpellList.Swiftness.MouseButton1Click:Connect(function()
+	script.Parent.SelectedSpell.Value = "Swiftness"
+end)
+
 
 ReplicatedStorage.RemotesEvents.GameEvents.LevelSystem.OnClientEvent:Connect(function(levelgui,level)
 	if levelgui == true then
 		script.Parent.CaveUIResearchUI.LevelGui.Visible = true
 		if level ~= 2 or 1 then
 			script.Parent.CaveUIResearchUI.LevelGui.Frame.TextLabel.Text = "Level Up! You are now Level "..tostring(level).."."
-		elseif level == 1 then
-			script.Parent.CaveUIResearchUI.LevelGui.Frame.TextLabel.Text = "Level Up! You are now Level "..tostring(level)..". You've unlocked the Primary Reactor Airlock!"
 		elseif level == 2 then
 			script.Parent.CaveUIResearchUI.LevelGui.Frame.TextLabel.Text = "Level Up! You are now Level "..tostring(level)..". You've unlocked Space Travel!"
 		end
@@ -664,6 +783,11 @@ script.Parent.Settings.MainContext.Appearance.Dark.MouseButton1Click:Connect(fun
 	script.Parent.Settings.MainContext.Appearance.Light.Active = true
 end)
 
+
+script.Parent.ButtonMenuFrame.QuestsButton.MouseButton1Click:Connect(function()
+	script.Parent.Quests.Visible = true
+end)
+
 script.Parent.Settings.MainContext.Appearance.Light.MouseButton1Click:Connect(function()
 	script.Parent.Settings.BackgroundColor3 = Colors.light.settings.windowborder
 	for _, v in pairs(script.Parent.Settings.ActionBar:GetDescendants()) do
@@ -716,24 +840,7 @@ script.Parent.Settings.MainContext.Appearance.Light.MouseButton1Click:Connect(fu
 	script.Parent.Settings.MainContext.Appearance.Light.Active = true
 end)
 
-
-script.Parent.Settings.MainContext.Appearance.MenuFull.MouseButton1Click:Connect(function()
-	script.Parent.MenuButton.Visible = true
-	script.Parent.MiniMenu.Visible = false
-	script.Parent.QuestsButton.Position = UDim2.new(0.121, 0, 0.947, 0)
-	script.Parent.Settings.MainContext.Appearance.MenuMini.BackgroundColor3 = buttoncolors.disabled
-	script.Parent.Settings.MainContext.Appearance.MenuFull.BackgroundColor3 = buttoncolors.enabled
-end)
-
-
-script.Parent.Settings.MainContext.Appearance.MenuMini.MouseButton1Click:Connect(function()
-	script.Parent.MenuButton.Visible = false
-	script.Parent.MiniMenu.Visible = true
-	script.Parent.QuestsButton.Position = UDim2.new(0.05, 0, 0.947, 0)
-	script.Parent.Settings.MainContext.Appearance.MenuFull.BackgroundColor3 = buttoncolors.disabled
-	script.Parent.Settings.MainContext.Appearance.MenuMini.BackgroundColor3 = buttoncolors.enabled
-end)
-
+script.Parent.About.InteractionMenu.About.VersionExact.Text = "Version "..game.Workspace:GetAttribute("Version")
 
 
 script.Parent.Settings.MainContext.Accessibility.ShakeOn.MouseButton1Click:Connect(function()
@@ -825,24 +932,30 @@ script.Parent.Skip.MouseButton1Click:Connect(function()
 	player.PlayerScripts.Cutscenes.ShuttingOff.Disabled = true
 	player.PlayerScripts.Cutscenes.Startup_High.Disabled = true
 	script.Parent.Skip.Visible = false
-	script.Parent.Cine.Visible = false
+	script.Parent.Cine.Frame.Cine:TweenPosition(UDim2.new(-0.058, 0, -2.75, 0))
+	script.Parent.Cine.Frame.Cine2:TweenPosition(UDim2.new(-0.036, 0, 1.05, 0))
+	TweenService:Create(game.Workspace.CurrentCamera, TweenInfo.new(0.5), {FieldOfView = 70}):Play()
 	starterGui:SetCore("TopbarEnabled", true)
 	starterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack,true)
+	task.wait(2)
+	script.Parent.Cine.Visible = false
 end)
 
 script.Parent.MiniMenu.MouseButton1Click:Connect(function()
+	ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addInformation","Player opened menu")
 	if menu == true then
 		script.Parent.Menu.Visible = true
 		script.Parent.Parent.Click:Play()
 		if UIS.TouchEnabled and not UIS.KeyboardEnabled and not UIS.MouseEnabled
 			and not UIS.GamepadEnabled and not GuiService:IsTenFootInterface() then
-			script.Parent.Menu:TweenPosition(UDim2.new(0.007, 0, 0.399, 0))
+			script.Parent.Menu:TweenPosition(UDim2.new(0.018, 0, 0.433, 0))
 		else
-			script.Parent.Menu:TweenPosition(UDim2.new(0.009, 0, 0.399, 0))
+			script.Parent.Menu:TweenPosition(UDim2.new(0.018, 0, 0.433, 0))
 		end
 		task.wait(0.05)
 		menu = false
 	elseif menu == false then
+		ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addInformation","Player closed menu")
 		script.Parent.Parent.Click:Play()
 		if UIS.TouchEnabled and not UIS.KeyboardEnabled and not UIS.MouseEnabled
 			and not UIS.GamepadEnabled and not GuiService:IsTenFootInterface() then
@@ -857,8 +970,9 @@ script.Parent.MiniMenu.MouseButton1Click:Connect(function()
 	end
 end)
 
-script.Parent.MenuButton.MouseButton1Click:Connect(function()
+script.Parent.ButtonMenuFrame.MenuButton.MouseButton1Click:Connect(function()
 	if menu == true then
+		ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addInformation","Player opened menu")
 		script.Parent.Menu.Visible = true
 		script.Parent.Parent.Click:Play()
 		if UIS.TouchEnabled and not UIS.KeyboardEnabled and not UIS.MouseEnabled
@@ -870,6 +984,7 @@ script.Parent.MenuButton.MouseButton1Click:Connect(function()
 		task.wait(0.05)
 		menu = false
 	elseif menu == false then
+		ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addInformation","Player closed menu")
 		script.Parent.Parent.Click:Play()
 		if UIS.TouchEnabled and not UIS.KeyboardEnabled and not UIS.MouseEnabled
 			and not UIS.GamepadEnabled and not GuiService:IsTenFootInterface() then
@@ -885,7 +1000,7 @@ script.Parent.MenuButton.MouseButton1Click:Connect(function()
 end)
 
 
-script.Parent.MenuButton.MouseEnter:Connect(function()
+script.Parent.ButtonMenuFrame.MenuButton.MouseEnter:Connect(function()
 	script.Parent.Parent.Hover:Play()
 end)
 
@@ -893,16 +1008,11 @@ end)
 ReplicatedStorage.RemotesEvents.GuiEvents.AddFacilityStatus.OnClientEvent:Connect(function(text,sec)
 	script.Parent.FacilityStatus.txt.TextLabel.Text = text
 	script.Parent.FacilityStatus:TweenPosition(UDim2.new(0.102, 0, 0.056, 0))
-	script.Parent.Countdown:TweenPosition(UDim2.new(0.338, 0, 0.173, 0))
+	script.Parent.Parent.CountdownUI.CountdownFrame:TweenPosition(UDim2.new(0.338, 0, 0.173, 0))
 	for z = sec,0,-1 do
-		script.Parent.FacilityStatus.Frame.close.Text = "Closes in "..z.." seconds."
-		if z == 1 then
-			script.Parent.FacilityStatus.Frame.close.Text = "Closes in 1 second."
-		end
 		if z == 0 then
-			script.Parent.FacilityStatus.Frame.close.Text = "Closes in 0 seconds."
 			script.Parent.FacilityStatus:TweenPosition(UDim2.new(0.102, 0,-0.23, 0))
-			script.Parent.Countdown:TweenPosition(UDim2.new(0.338, 0,0.03, 0))
+			script.Parent.Parent.CountdownUI.CountdownFrame:TweenPosition(UDim2.new(0.338, 0,0.03, 0))
 		end
 		wait(1)
 	end
@@ -912,7 +1022,14 @@ end)
 ReplicatedStorage.RemotesEvents.GuiEvents.Cinematic.OnClientEvent:Connect(function(visible)
 	if visible == true then
 		script.Parent.Cine.Visible = true
+		TweenService:Create(game.Workspace.CurrentCamera, TweenInfo.new(0.5), {FieldOfView = 75}):Play()
+		script.Parent.Cine.Frame.Cine:TweenPosition(UDim2.new(-0.058, 0, -2.572, 0))
+		script.Parent.Cine.Frame.Cine2:TweenPosition(UDim2.new(-0.036, 0, 0.91, 0))
 	elseif visible == false then
+		script.Parent.Cine.Frame.Cine:TweenPosition(UDim2.new(-0.058, 0, -2.75, 0))
+		script.Parent.Cine.Frame.Cine2:TweenPosition(UDim2.new(-0.036, 0, 1.05, 0))
+		TweenService:Create(game.Workspace.CurrentCamera, TweenInfo.new(0.5), {FieldOfView = 70}):Play()
+		task.wait(2)
 		script.Parent.Cine.Visible = false
 	end
 end)
@@ -941,7 +1058,7 @@ ReplicatedStorage.RemotesEvents.GuiEvents.GotOreEvent.OnClientEvent:Connect(func
 		script.Parent.CaveUIResearchUI.GotOre.Frame.TextLabel.Text = "You got an Iron Ore!"
 		game:GetService("TweenService"):Create(script.Parent.Resources["*OreList"].Frame.Iron, TweenInfo.new(0.5,Enum.EasingStyle.Linear), {BorderSizePixel = 8}):Play()
 		task.wait(5)
-		script.Parent.CaveUIResearchUI.GotOre.Visble = false
+		script.Parent.CaveUIResearchUI.GotOre.Visible = false
 		game:GetService("TweenService"):Create(script.Parent.Resources["*OreList"].Frame.Iron, TweenInfo.new(0.5,Enum.EasingStyle.Linear), {BorderSizePixel = 0}):Play()
 	end
 end)
@@ -959,19 +1076,20 @@ script.Parent.CaveUIResearchUI.Inventory.Frame.TextButton.MouseButton1Click:Conn
 end)
 
 
-script.Parent.HeyHey.InteractionMenu.MiningOutCreate.MouseButton1Click:Connect(function()
+script.Parent.HeyHey.InteractionMenu.SpawnChoices.Frame.MiningOutCreate.MouseButton1Click:Connect(function()
 	player.PlayerScripts.ChoosersPoosers.MineCreateOwnCave.Disabled = false
 	player.PlayerScripts.ChoosersPoosers.KillMonsters.Disabled = true
 	player.PlayerScripts.ChoosersPoosers.ExpOutdoors.Disabled = true
+	player.PlayerScripts.ChoosersPoosers.ShowOff.Disabled = true
 	player.PlayerScripts.ChoosersPoosers.ControlReactors.Disabled = true
 	script.Parent.HeyHey.InteractionMenu.ChooseOp.Text = "Mine Cave #1"
 	player.PlayerScripts.ChoosersPoosers.Trains.Disabled = true
 	TypeOfJob.Value = "Cave"
 end)
 
-script.Parent.HeyHey.InteractionMenu.FacilLobby.MouseButton1Click:Connect(function()
+script.Parent.HeyHey.InteractionMenu.SpawnChoices.Frame.FacilLobby.MouseButton1Click:Connect(function()
 	player.PlayerScripts.ChoosersPoosers.MineCreateOwnCave.Disabled = true
-	player.PlayerScripts.ChoosersPoosers.KillMonsters.Disabled = false
+	player.PlayerScripts.ChoosersPoosers.ShowOff.Disabled = false
 	player.PlayerScripts.ChoosersPoosers.ExpOutdoors.Disabled = true
 	player.PlayerScripts.ChoosersPoosers.ControlReactors.Disabled = true
 	script.Parent.HeyHey.InteractionMenu.ChooseOp.Text = "Lobby"
@@ -980,21 +1098,23 @@ script.Parent.HeyHey.InteractionMenu.FacilLobby.MouseButton1Click:Connect(functi
 
 end)
 
-script.Parent.HeyHey.InteractionMenu.ControlTheReactor.MouseButton1Click:Connect(function()
+script.Parent.HeyHey.InteractionMenu.SpawnChoices.Frame.ControlTheReactor.MouseButton1Click:Connect(function()
 	player.PlayerScripts.ChoosersPoosers.MineCreateOwnCave.Disabled = true
 	player.PlayerScripts.ChoosersPoosers.KillMonsters.Disabled = true
 	player.PlayerScripts.ChoosersPoosers.ExpOutdoors.Disabled = true
 	player.PlayerScripts.ChoosersPoosers.ControlReactors.Disabled = false
+	player.PlayerScripts.ChoosersPoosers.ShowOff.Disabled = true
 	script.Parent.HeyHey.InteractionMenu.ChooseOp.Text = "Control the Reactor"
 	player.PlayerScripts.ChoosersPoosers.Trains.Disabled = true
 	TypeOfJob.Value = "Reactor"
 end)
 
-script.Parent.HeyHey.InteractionMenu.ExploreOutdoor.MouseButton1Click:Connect(function()
+script.Parent.HeyHey.InteractionMenu.SpawnChoices.Frame.ExploreOutdoor.MouseButton1Click:Connect(function()
 	player.PlayerScripts.ChoosersPoosers.MineCreateOwnCave.Disabled = true
 	player.PlayerScripts.ChoosersPoosers.KillMonsters.Disabled = true
 	player.PlayerScripts.ChoosersPoosers.ExpOutdoors.Disabled = false
 	player.PlayerScripts.ChoosersPoosers.ControlReactors.Disabled = true
+	player.PlayerScripts.ChoosersPoosers.ShowOff.Disabled = true
 	player.PlayerScripts.ChoosersPoosers.Trains.Disabled = true
 	script.Parent.HeyHey.InteractionMenu.ChooseOp.Text = "Hangout / Explore the Outdoors"
 	TypeOfJob.Value = "Outdoors"
@@ -1002,27 +1122,23 @@ script.Parent.HeyHey.InteractionMenu.ExploreOutdoor.MouseButton1Click:Connect(fu
 end)
 
 
-script.Parent.HeyHey.InteractionMenu.Trains.MouseButton1Click:Connect(function()
+script.Parent.HeyHey.InteractionMenu.SpawnChoices.Frame.Trains.MouseButton1Click:Connect(function()
 	player.PlayerScripts.ChoosersPoosers.MineCreateOwnCave.Disabled = true
 	player.PlayerScripts.ChoosersPoosers.KillMonsters.Disabled = true
 	player.PlayerScripts.ChoosersPoosers.ExpOutdoors.Disabled = true
-	player.PlayerScripts.ChoosersPoosers.Trains.Disabled = false
 	player.PlayerScripts.ChoosersPoosers.ControlReactors.Disabled = true
 	script.Parent.HeyHey.InteractionMenu.ChooseOp.Text = "Trains"
+	player.PlayerScripts.ChoosersPoosers.ShowOff.Disabled = false
 	TypeOfJob.Value = "Trains"
 end)
 
 
-script.Parent.HeyHey.InteractionMenu.Frame.Choose.MouseButton1Click:Connect(function()
+script.Parent.HeyHey.InteractionMenu.ButtonsChoice.Choose.MouseButton1Click:Connect(function()
 	camera.CameraType = Enum.CameraType.Custom
+	script.Parent.OutOfIntro.Value = true
 	starterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack,true)
 	game.Workspace.CurrentCamera.CameraSubject = game.Players.LocalPlayer.Character.Humanoid
-	player.PlayerScripts.ChoosersPoosers.MineCreateOwnCave.Disabled = true
-	player.PlayerScripts.ChoosersPoosers.KillMonsters.Disabled = true
-	player.PlayerScripts.ChoosersPoosers.ExpOutdoors.Disabled = true
-	player.PlayerScripts.ChoosersPoosers.ControlReactors.Disabled = true
-	player.PlayerScripts.ChoosersPoosers.Trains.Disabled = true
-	script.Parent.ClientHandler.LocalScript:Destroy()
+	player.PlayerScripts.ChoosersPoosers:Destroy()
 	workspace.World.Objects.Facility.TemporaryShow:ClearAllChildren()
 	script.Parent.HeyHey.Visible = false
 	if TypeOfJob.Value == "Cave" then
@@ -1038,49 +1154,73 @@ script.Parent.HeyHey.InteractionMenu.Frame.Choose.MouseButton1Click:Connect(func
 	elseif TypeOfJob.Value == "Trains" then
 		teleport("Trains")
 		script.Parent.AchievementUIs.Welcome.Visible = true
-	elseif TypeOfJob.Value == "Reactor" then
+	elseif TypeOfJob.Value == "Reactor" and player.HasReverbPass.Value == true then
 		teleport("Reactor")
 		script.Parent.AchievementUIs.CTRLReactor.Visible = true		
+	elseif TypeOfJob.Value == "Reactor" and player.HasReverbPass.Value == false then
+		script.Parent.NoReverbPass.Visible = true
+		teleport("Lobby")
 	end
+	TweenService:Create(game.Lighting.uiBlur,TweenInfo.new(0.75),{Size = 0}):Play()
+	starterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack,true)
+	task.spawn(function()
+		task.wait(5)
+		starterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack,true)
+	end)
+	script.Parent.ClientHandler.LocalScript:Destroy()
+	script.Parent.HeyHey:Destroy()
 end)
 
 
 -- then quick spawning
 
-script.Parent.QuickSpawn.InteractionMenu.MiningOutCreate.MouseButton1Click:Connect(function()
+script.Parent.QuickSpawn.InteractionMenu.SpawnChoices.Frame.MiningOutCreate.MouseButton1Click:Connect(function()
 	script.Parent.QuickSpawn.InteractionMenu.ChooseOp.Text = "Mine Cave #1"
 	TypeOfJob.Value = "Cave1"
 end)
 
-script.Parent.QuickSpawn.InteractionMenu.ExploreOutdoor.MouseButton1Click:Connect(function()
+script.Parent.QuickSpawn.InteractionMenu.SpawnChoices.Frame.ExploreOutdoor.MouseButton1Click:Connect(function()
 	script.Parent.QuickSpawn.InteractionMenu.ChooseOp.Text = "Outdoors"
 	TypeOfJob.Value = "Outside"
 end)
 
-script.Parent.QuickSpawn.InteractionMenu.ControlTheReactor.MouseButton1Click:Connect(function()
+script.Parent.QuickSpawn.InteractionMenu.SpawnChoices.Frame.ControlTheReactor.MouseButton1Click:Connect(function()
 	script.Parent.QuickSpawn.InteractionMenu.ChooseOp.Text = "Control the Primary Reactor"
 	TypeOfJob.Value = "PrimaryReactorControlRoom"
 end)
 
-script.Parent.QuickSpawn.InteractionMenu.KillSumMonster.MouseButton1Click:Connect(function()
-	script.Parent.QuickSpawn.InteractionMenu.ChooseOp.Text = "Space Travel"
-	TypeOfJob.Value = "SpaceTravel"
+script.Parent.QuickSpawn.InteractionMenu.SpawnChoices.Frame.Trains.MouseButton1Click:Connect(function()
+	script.Parent.QuickSpawn.InteractionMenu.ChooseOp.Text = "Sector A"
+	TypeOfJob.Value = "Sector A"
 end)
 
 
-
-script.Parent.QuickSpawn.InteractionMenu.Frame.Choose.MouseButton1Click:Connect(function()
-	script.Parent.QuickSpawn.Visible = false
+script.Parent.QuickSpawn.InteractionMenu.Choices.Choose.MouseButton1Click:Connect(function()
 	if TypeOfJob.Value == "Cave1" then
 		ReplicatedStorage.RemotesEvents.GameEvents.SetSpawnEvent:FireServer(TypeOfJob.Value)
 	elseif TypeOfJob.Value == "Outside" then
 		ReplicatedStorage.RemotesEvents.GameEvents.SetSpawnEvent:FireServer(TypeOfJob.Value)
-	elseif TypeOfJob.Value == "PrimaryReactorControlRoom" then
+	elseif TypeOfJob.Value == "PrimaryReactorControlRoom" and player.HasReverbPass.Value == true then
 		ReplicatedStorage.RemotesEvents.GameEvents.SetSpawnEvent:FireServer(TypeOfJob.Value)
-		script.Parent.AchievementUIs.Welcome.Visible = true
-	elseif TypeOfJob.Value == "SpaceTravel" then
+	elseif TypeOfJob.Value == "PrimaryReactorControlRoom" and player.HasReverbPass.Value == false then
+		script.Parent.NoReverbPass.Visible = true
+	elseif TypeOfJob.Value == "Sector A" then
 		ReplicatedStorage.RemotesEvents.GameEvents.SetSpawnEvent:FireServer(TypeOfJob.Value)
 	end
+	tweeny(script.Parent.QuickSpawn.InteractionMenu.SpawnSet,1)
+	task.wait(0.05)
+	tweeny(script.Parent.QuickSpawn.InteractionMenu.SpawnSet,0)
+	script.Parent.QuickSpawn.InteractionMenu.SpawnSet.Visible = true
+	task.wait(3)
+	tweeny(script.Parent.QuickSpawn.InteractionMenu.SpawnSet,1)
+	task.wait(0.75)
+	script.Parent.QuickSpawn.InteractionMenu.SpawnSet.Visible = false
+end)
+
+
+script.Parent.QuickSpawn.InteractionMenu.Choices.Cancel.MouseButton1Click:Connect(function()
+	script.Parent.QuickSpawn.Visible = false
+	script.Parent.Parent.Click:Play()
 end)
 
 -- about
@@ -1088,39 +1228,48 @@ script.Parent.Menu.About.MouseButton1Click:Connect(function()
 	script.Parent.About.Visible = true
 	uiOpen()
 	tweeny(script.Parent.About,0)
-	script.Parent.About:TweenPosition(UDim2.new(0.175, 0,0.219, 0),"Out","Quad",0.28)
+	script.Parent.About:TweenPosition(UDim2.new(0.292, 0,0.433, 0),"Out","Quad",0.28)
 end)
 
 script.Parent.About.InteractionMenu.Exit.MouseButton1Click:Connect(function()
 	tweeny(script.Parent.About,1)
 	uiClose()
-	script.Parent.About:TweenPosition(UDim2.new(0.175, 0,0.230, 0),"Out","Quad",0.28)
+	script.Parent.About:TweenPosition(UDim2.new(0.292, 0,0.444, 0),"Out","Quad",0.28)
 	wait(0.3)
 	script.Parent.About.Visible = false
+end)
+
+-- set spawn
+
+script.Parent.Menu.QuickSpawn.MouseButton1Click:Connect(function()
+	script.Parent.QuickSpawn.Visible = true
+	ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addInformation","Player is adjusting their Spawn Location")
 end)
 
 --feedback
 script.Parent.Menu.Feedback.MouseButton1Click:Connect(function()
 	script.Parent.Feedback.Visible = true
+	ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addInformation","Player is about to send Feedback")
 	tweeny(script.Parent.Feedback,0)
 	uiOpen()
-	script.Parent.Feedback:TweenPosition(UDim2.new(0.175, 0,0.219, 0),"Out","Quad",0.28)
+	script.Parent.Feedback:TweenPosition(UDim2.new(0.179, 0,0.219, 0),"Out","Quad",0.28)
 end)
 
 script.Parent.Feedback.InteractionMenu.SendExitChoices.Exit.MouseButton1Click:Connect(function()
 	tweeny(script.Parent.Feedback,1)
 	uiClose()
-	script.Parent.Feedback:TweenPosition(UDim2.new(0.175, 0,0.230, 0),"Out","Quad",0.28)
+	script.Parent.Feedback:TweenPosition(UDim2.new(0.175, 0,0.200, 0),"Out","Quad",0.28)
 	wait(0.3)
 	script.Parent.Feedback.Visible = false
 end)
 
 --donate
 script.Parent.Menu.Donate.MouseButton1Click:Connect(function()
+	ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addInformation","Player is attempting to donate")
 	script.Parent.Donate.Visible = true
 	uiOpen()
 	tweeny(script.Parent.Donate,0)
-	script.Parent.Donate:TweenPosition(UDim2.new(0.175, 0,0.219, 0),"Out","Quad",0.28)
+	script.Parent.Donate:TweenPosition(UDim2.new(0.185, 0,0.136, 0),"Out","Quad",0.28)
 end)
 
 script.Parent.Donate.InteractionMenu.Exit.MouseButton1Click:Connect(function()
@@ -1134,15 +1283,13 @@ end)
 
 -- credits
 
-script.Parent.Menu.QuickSpawn.MouseButton1Click:Connect(function()
-	script.Parent.QuickSpawn.Visible = true
-end)
+
 
 script.Parent.Menu.Credits.MouseButton1Click:Connect(function()
 	script.Parent.Credits.Visible = true
 	uiOpen()
 	tweeny(script.Parent.Credits,0)
-	script.Parent.Credits:TweenPosition(UDim2.new(0.175, 0,0.219, 0),"Out","Quad",0.28)
+	script.Parent.Credits:TweenPosition(UDim2.new(0.185, 0,0.136, 0),"Out","Quad",0.28)
 end)
 
 script.Parent.Credits.InteractionMenu.Exit.MouseButton1Click:Connect(function()
@@ -1216,16 +1363,8 @@ script.Parent.Settings.ActionBar.TextButton.MouseButton1Click:Connect(function()
 	script.Parent.Settings.MainContext.Visible = false
 end)
 
-script.Parent.Parent.SurfaceGui.ElectricalSystemStartupOnly.TextButton.MouseButton1Click:Connect(function()
-	-- check to see if place id matches the place ; whether the branch would be internal, q/a testers or stable 
-	local id = bombdecoderplaces.stable --The ID of where you would like to teleport
-	ts:Teleport(id, player) --Teleport the player
-	script.Parent.BombDecoderTeleport.Visible = true
-end)
-
-
 script.Parent.ExitNavigation.MouseButton1Click:Connect(function()
-	navigation(false)
+	navigation(false, nil)
 end)
 
 ReplicatedStorage.Events.DisasterClient.OnClientEvent:Connect(function(isonorno)
@@ -1233,59 +1372,85 @@ ReplicatedStorage.Events.DisasterClient.OnClientEvent:Connect(function(isonorno)
 		script.Parent.Parent.CoreGUI.MeltdownOrOtherState.Value = true
 		script.Parent.MixIngredients.SubstanceOre.OvrLodTip.Visible = true
 		script.Parent.CombineMenu.OvrLodTip.Visible = true
-
-		Players.LocalPlayer.PlayerGui.LocalMusic.Outside.Day:Play()
-		Players.LocalPlayer.PlayerGui.LocalMusic.Outside.BirdChirp:Play()
-		Players.LocalPlayer.PlayerGui.LocalMusic.Outside.CricketChirp:Stop()
-		Players.LocalPlayer.PlayerGui.LocalMusic.Outside.Night:Stop()
-		Players.LocalPlayer.PlayerGui.LocalMusic.Outside.Wind:Stop()
-		Players.LocalPlayer.PlayerGui.LocalMusic.Outside.NightChristmas:Stop()
-
-
+		ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addDesignEvent","Core:DisasterStart")
+		script.Parent.SetContinousMusicOff.Disabled = false
+		script.Parent.SetInsideMusicContinous.Disabled = false
 	elseif isonorno == false then
 		script.Parent.Parent.CoreGUI.MeltdownOrOtherState.Value = false
 		script.Parent.MixIngredients.SubstanceOre.OvrLodTip.Visible = false
 		script.Parent.CombineMenu.OvrLodTip.Visible = false
+		script.Parent.SetContinousMusicOff.Disabled = true
+		script.Parent.SetInsideMusicContinous.Disabled = true
+		ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addDesignEvent","Core:DisasterEnd")
 	end
 end)
 
 ReplicatedStorage.RemotesEvents.GuiEvents.OtherUiController.OnClientEvent:Connect(function(uitype,en_dis)
 	if uitype == "Countdown" and en_dis == true then
-		script.Parent.Countdown.Visible = true
+		script.Parent.Parent.CountdownUI.Visible = true
 		wait(0.23)
-		script.Parent.Countdown.Visible = false
+		script.Parent.Parent.CountdownUI.Visible = false
 		wait(0.1)
-		script.Parent.Countdown.Visible = true
+		script.Parent.Parent.CountdownUI.Visible = true
 		wait(0.2)
-		script.Parent.Countdown.Visible = false
+		script.Parent.Parent.CountdownUI.Visible = false
 		wait(1)
-		script.Parent.Countdown.Visible = true
+		script.Parent.Parent.CountdownUI.Visible = true
 	elseif uitype == "Countdown" and en_dis == false then
-		script.Parent.Countdown.Visible = true
+		script.Parent.Parent.CountdownUI.Visible = true
 		wait(0.01)
-		script.Parent.Countdown.Visible = false
+		script.Parent.Parent.CountdownUI.Visible = false
 		wait(0.1)
-		script.Parent.Countdown.Visible = true
+		script.Parent.Parent.CountdownUI.Visible = true
 		wait(0.01)
-		script.Parent.Countdown.Visible = false
+		script.Parent.Parent.CountdownUI.Visible = false
 	elseif uitype == "MeltdownHappening" and en_dis == nil then
 		TweenService:Create(game.Lighting.PostCorrection, TweenInfo.new(3), {TintColor = redonmelt}):Play()
 		TweenService:Create(game.Workspace.CurrentCamera, TweenInfo.new(2), {FieldOfView = 64}):Play()
 		task.wait(3.95)
 		TweenService:Create(game.Lighting.PostCorrection, TweenInfo.new(2), {TintColor = uiColorDecreaseProperties.ResetTintColor}):Play()
 		TweenService:Create(game.Workspace.CurrentCamera, TweenInfo.new(1.5), {FieldOfView = 70}):Play()
+	elseif uitype == "Puzzle_SN" and en_dis == "Correct" then
+		script.Parent.PuzzlesUI.ScatteringNumbers.Error.Visible = false
+		script.Parent.PuzzlesUI.ScatteringNumbers.Correct.Visible = true
+		task.wait(3.5)
+		script.Parent.PuzzlesUI.ScatteringNumbers.Correct.Visible = false
+		script.Parent.PuzzlesUI.ScatteringNumbers.Visible = false
+	elseif uitype == "Puzzle_SN" and en_dis == "Incorrect" then
+		script.Parent.PuzzlesUI.ScatteringNumbers.Error.Visible = true
+		task.wait(2.5)
+		script.Parent.PuzzlesUI.ScatteringNumbers.Error.Visible = false
+	elseif uitype == "Puzzle_RN" and en_dis == "Correct" then
+		script.Parent.PuzzlesUI.RomanNumerals.Error.Visible = false
+		script.Parent.PuzzlesUI.RomanNumerals.Correct.Visible = true
+		task.wait(3.5)
+		script.Parent.PuzzlesUI.RomanNumerals.Correct.Visible = false
+		script.Parent.PuzzlesUI.RomanNumerals.Visible = false
+	elseif uitype == "Puzzle_RN" and en_dis == "Incorrect" then
+		script.Parent.PuzzlesUI.RomanNumerals.Error.Visible = true
+		task.wait(2.5)
+		script.Parent.PuzzlesUI.RomanNumerals.Error.Visible = false
+		script.Parent.PuzzlesUI.RomanNumerals.Visible = false
 	end
 end)
 
-ReplicatedStorage.RemotesEvents.GuiEvents.CountdownText.OnClientEvent:Connect(function(text)
-	script.Parent.Countdown.Frame.TextLabel.Text = "T-"..text
+ReplicatedStorage.Events.SetOnFire.OnClientEvent:Connect(function()
+	if player.Character then
+		local fire = Instance.new("Fire",player.Character.HumanoidRootPart)
+		fire.Size = 20
+		fire.Enabled = true
+		task.wait(90)
+		if fire then
+			fire:Destroy()
+		end
+	end
 end)
-
 
 game.Workspace.GameData:WaitForChild("EcoCC",3).ReactorStats.CoreTemp.Changed:Connect(function(val)
 	if val >= 3260 then
 		ReplicatedStorage.RemotesEvents.BadgeRewards:FireServer("melt")
 	elseif val >= 9000000 then
+		ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addDesignEvent","Core:OverloadMeltdownDisasterStart")
 		ReplicatedStorage.RemotesEvents.BadgeRewards:FireServer("overload")
 	end
 end)
@@ -1307,7 +1472,7 @@ ReplicatedStorage.Events.Nuclear.TheCoreExplode.OnClientEvent:Connect(function(e
 	end
 end)
 
-player:WaitForChild("leaderstats"):WaitForChild("Eco",7).Changed:Connect(function(current)
+player:WaitForChild("leaderstats"):WaitForChild("Eco",7).Changed:Connect(function(current: number)
 	script.Parent.Menu.FourCoins.TextLabel.Text = current.." Eco"
 end)
 if level_notload == false then
@@ -1315,14 +1480,7 @@ if level_notload == false then
 		if current >= 1 then
 			if workspace.AreaBlockOff:WaitForChild("BlockOff_CTRLR_Lvl4",5) then
 				workspace.AreaBlockOff.BlockOff_CTRLR_Lvl4:Destroy()
-				if workspace.AreaBlockOff:WaitForChild("BlockOff_CTRLR_Lvl2",5) then
-					workspace.AreaBlockOff.BlockOff_CTRLR_Lvl2:Destroy()
-				end
-			end		
-		elseif current >= 2 then
-			if workspace.AreaBlockOff:WaitForChild("BlockOff_CTRLR_Lvl2",5) then
-				workspace.AreaBlockOff.BlockOff_CTRLR_Lvl2:Destroy()
-			end	
+			end
 		end
 
 		if player.Level.Value >= 1 and player.Level.Value <= 4 then
@@ -1370,11 +1528,12 @@ if level_notload == false then
 end
 
 script.Parent.Donate.InteractionMenu.DonateButtons["10Robux"].MouseButton1Click:Connect(function()
-
+	ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addInformation","Player donating")
 	game:GetService("MarketplaceService"):PromptProductPurchase(player,1256027063)
 
 end)
 script.Parent.Donate.InteractionMenu.DonateButtons["100Robux"].MouseButton1Click:Connect(function()
+	ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addInformation","Player donating")
 	game:GetService("MarketplaceService"):PromptProductPurchase(player,1256027086)
 
 end)
@@ -1382,6 +1541,7 @@ end)
 
 -- Settings Functionality
 script.Parent.Menu.Settings.MouseButton1Click:Connect(function()
+	ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addInformation","Player is adjusting their Settings")
 	script.Parent.Settings.Visible = true
 	script.Parent.Settings.MainContext.Visible = true
 	uiOpen()
@@ -1390,6 +1550,7 @@ script.Parent.Menu.Settings.MouseButton1Click:Connect(function()
 end)
 
 script.Parent.Menu.Shop.MouseButton1Click:Connect(function()
+	ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addInformation","Player opened Shop")
 	script.Parent.ShopUI.Visible = true
 	uiOpen()
 	game:GetService("TweenService"):Create(game.SoundService.SongsCanMute,TweenInfo.new(0.8),{Volume = 0}):Play()
@@ -1403,15 +1564,28 @@ Settings.InteractionMenu.Accessibility.MouseButton1Click:Connect(function()
 	Settings.MainContext.Accessibility.Visible = true
 	Settings.MainContext.Audio.Visible = false
 	Settings.MainContext.Performance.Visible = false
+	Settings.MainContext.Privacy.Visible = false
 	Settings.MainContext.Others.Visible = false
 	Settings.MainContext.Appearance.Visible = false
 	Settings.ActionBar.TextLabel.Text = "Accessibility"
+end)
+
+Settings.InteractionMenu.Privacy.MouseButton1Click:Connect(function()
+	ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addInformation","Player adjusting Privacy settings")
+	Settings.MainContext.Accessibility.Visible = false
+	Settings.MainContext.Audio.Visible = false
+	Settings.MainContext.Privacy.Visible = true
+	Settings.MainContext.Performance.Visible = false
+	Settings.MainContext.Others.Visible = false
+	Settings.MainContext.Appearance.Visible = false
+	Settings.ActionBar.TextLabel.Text = "Privacy"
 end)
 
 Settings.InteractionMenu.Audio.MouseButton1Click:Connect(function()
 	Settings.MainContext.Accessibility.Visible = false
 	Settings.MainContext.Audio.Visible = true
 	Settings.MainContext.Performance.Visible = false
+	Settings.MainContext.Privacy.Visible = false
 	Settings.MainContext.Others.Visible = false
 	Settings.MainContext.Appearance.Visible = false
 	Settings.ActionBar.TextLabel.Text = "Audio"
@@ -1420,6 +1594,7 @@ end)
 Settings.InteractionMenu.Performance.MouseButton1Click:Connect(function()
 	Settings.MainContext.Accessibility.Visible = false
 	Settings.MainContext.Audio.Visible = false
+	Settings.MainContext.Privacy.Visible = false
 	Settings.MainContext.Performance.Visible = true
 	Settings.MainContext.Others.Visible = false
 	Settings.MainContext.Appearance.Visible = false
@@ -1430,6 +1605,7 @@ Settings.InteractionMenu.Others.MouseButton1Click:Connect(function()
 	Settings.MainContext.Accessibility.Visible = false
 	Settings.MainContext.Audio.Visible = false
 	Settings.MainContext.Performance.Visible = false
+	Settings.MainContext.Privacy.Visible = false
 	Settings.MainContext.Others.Visible = true
 	Settings.MainContext.Appearance.Visible = false
 	Settings.ActionBar.TextLabel.Text = "Others"
@@ -1440,6 +1616,7 @@ Settings.InteractionMenu.Appearance.MouseButton1Click:Connect(function()
 	Settings.MainContext.Accessibility.Visible = false
 	Settings.MainContext.Audio.Visible = false
 	Settings.MainContext.Performance.Visible = false
+	Settings.MainContext.Privacy.Visible = false
 	Settings.MainContext.Others.Visible = true
 	Settings.MainContext.Appearance.Visible = true
 	Settings.ActionBar.TextLabel.Text = "Appearance"
@@ -1473,14 +1650,12 @@ end)
 
 Settings.MainContext.Performance.SHDWS_On.MouseButton1Click:Connect(function()
 	game.Lighting.GlobalShadows = true
-	CleanupPerformance.EnableLowQuality("castshadow")
 	Settings.MainContext.Performance.SHDWS_On.BackgroundColor3 = buttoncolors.enabled
 	Settings.MainContext.Performance.SHDWS_Off.BackgroundColor3 = buttoncolors.disabled
 end)
 
 Settings.MainContext.Performance.SHDWS_Off.MouseButton1Click:Connect(function()
 	game.Lighting.GlobalShadows = false
-	CleanupPerformance.DisableLowQuality("castshadow")
 	Settings.MainContext.Performance.SHDWS_On.BackgroundColor3 = buttoncolors.disabled
 	Settings.MainContext.Performance.SHDWS_Off.BackgroundColor3 = buttoncolors.enabled
 end)
@@ -1645,7 +1820,7 @@ end)
 -- TODO: Redo entire Tutorial System; make it interactive
 task.wait(1)
 player:WaitForChild("Inventory",3)
-player.Inventory:WaitForChild("Carbon",9).Changed:Connect(function(new)
+player.Inventory:WaitForChild("Carbon",9).Changed:Connect(function(new: number)
 	script.Parent.Resources["*OreList"].Frame.Carbon.Text = new.." Carbon"
 	if new == 0 then
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Carbon.Visible = false
@@ -1653,7 +1828,7 @@ player.Inventory:WaitForChild("Carbon",9).Changed:Connect(function(new)
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Carbon.Visible = true
 	end
 end)
-player.Inventory:WaitForChild("Coolant",4).Changed:Connect(function(new)
+player.Inventory:WaitForChild("Coolant",4).Changed:Connect(function(new: number)
 	script.Parent.Resources["*OreList"].Frame.Coolant.Text = new.." Coolant"
 	if new == 0 then
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Coolant.Visible = false
@@ -1661,7 +1836,7 @@ player.Inventory:WaitForChild("Coolant",4).Changed:Connect(function(new)
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Coolant.Visible = true
 	end
 end)
-player.Inventory:WaitForChild("H2O",3).Changed:Connect(function(new)
+player.Inventory:WaitForChild("H2O",3).Changed:Connect(function(new: number)
 	script.Parent.Resources["*OreList"].Frame.H2O.Text = new.." H2O"
 	if new == 0 then
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.H2O.Visible = false
@@ -1669,7 +1844,7 @@ player.Inventory:WaitForChild("H2O",3).Changed:Connect(function(new)
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.H2O.Visible = true
 	end
 end)
-player.Inventory:WaitForChild("Iron").Changed:Connect(function(new)
+player.Inventory:WaitForChild("Iron").Changed:Connect(function(new: number)
 	workspace.World.Objects.Miscellaneous:WaitForChild("UnlockedIron").BillboardGui.TextLabel.Text = "Unlocked Iron Pick!"
 	workspace.World.Objects.Miscellaneous:WaitForChild("UnlockedIron2").BillboardGui.TextLabel.Text = "Unlocked Iron Pick!"
 	script.Parent.Resources["*OreList"].Frame.Iron.Text = new.." Iron"
@@ -1686,7 +1861,7 @@ player.Inventory:WaitForChild("Iron").Changed:Connect(function(new)
 		workspace.World.Objects.Miscellaneous:WaitForChild("UnlockedIron2").BillboardGui.TextLabel.Text = "Must have "..10-new.." more Iron Ores to get this."
 	end
 end)
-player.Inventory:WaitForChild("Oxygen").Changed:Connect(function(new)
+player.Inventory:WaitForChild("Oxygen").Changed:Connect(function(new: number)
 	script.Parent.Resources["*OreList"].Frame.Oxygen.Text = new.." Oxygen"
 	if new == 0 then
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Oxygen.Visible = false
@@ -1694,7 +1869,7 @@ player.Inventory:WaitForChild("Oxygen").Changed:Connect(function(new)
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Oxygen.Visible = true
 	end
 end)
-player.Inventory:WaitForChild("Ruby").Changed:Connect(function(new)
+player.Inventory:WaitForChild("Ruby").Changed:Connect(function(new: number)
 	workspace.World.Objects.Miscellaneous:WaitForChild("UnlockedRuby",2).BillboardGui.TextLabel.Text = "Unlocked Ruby Pick!"
 	workspace.World.Objects.Miscellaneous:WaitForChild("UnlockedRuby2",4).BillboardGui.TextLabel.Text = "Unlocked Ruby Pick!"
 	script.Parent.Resources["*OreList"].Frame.Ruby.Text = new.." Ruby"
@@ -1711,7 +1886,7 @@ player.Inventory:WaitForChild("Ruby").Changed:Connect(function(new)
 		workspace.World.Objects.Miscellaneous:WaitForChild("UnlockedRuby2",4).BillboardGui.TextLabel.Text = "Must have "..5-new.." more Ruby Ores to get Ruby Pick."
 	end
 end)
-player.Inventory:WaitForChild("Phantom",3).Changed:Connect(function(new)
+player.Inventory:WaitForChild("Phantom",3).Changed:Connect(function(new: number)
 	script.Parent.Resources["*OreList"].Frame.Phantom.Text = new.." Phantom"
 	workspace.World.Objects.Miscellaneous:WaitForChild("UnlockedPhantom",4).BillboardGui.TextLabel.Text = "Unlocked Phantom Pick!"
 	workspace.World.Objects.Miscellaneous:WaitForChild("UnlockedPhantom2",4).BillboardGui.TextLabel.Text = "Must have "..5-new.." more Phantom Ores to get Phantom Pick."
@@ -1728,7 +1903,7 @@ player.Inventory:WaitForChild("Phantom",3).Changed:Connect(function(new)
 		workspace.World.Objects.Miscellaneous:WaitForChild("UnlockedPhantom2",4).BillboardGui.TextLabel.Text = "Must have "..15-new.." more Phantom Ores to get Phantom Pick."
 	end
 end)
-player.Inventory:WaitForChild("Hydrogen").Changed:Connect(function(new)
+player.Inventory:WaitForChild("Hydrogen").Changed:Connect(function(new: number)
 	script.Parent.Resources["*OreList"].Frame.Hydrogen.Text = new.." Hydrogen"
 	if new == 0 then
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Hydrogen.Visible = false
@@ -1736,7 +1911,7 @@ player.Inventory:WaitForChild("Hydrogen").Changed:Connect(function(new)
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Hydrogen.Visible = true
 	end
 end)
-player.Inventory:WaitForChild("Rock").Changed:Connect(function(new)
+player.Inventory:WaitForChild("Rock").Changed:Connect(function(new: number)
 	script.Parent.Resources["*OreList"].Frame.Rock.Text = new.." Rock"
 	if new == 0 then
 		script.Parent.CombineMenu.ResourcesMenu.InteractionMenu.Frame.Rock.Visible = false
@@ -1833,6 +2008,7 @@ end)
 script.Parent.ShopUI.AreYouSure.Confirmation.InteractionMenu.ChoiceFrame.Confirm.MouseButton1Click:Connect(function()
 	script.Parent.ShopUI.AreYouSure.Processsing.Visible = true
 	script.Parent.ShopUI.AreYouSure.Confirmation.Visible = false
+	script.Parent.ShopUI.MainContext.Gear.GearContainer.Visible = false
 	task.wait(math.random(0.5,2))
 	PurchaseEvent:FireServer(tools[selectedgear.Value])
 	task.wait(0.02)
@@ -1846,6 +2022,7 @@ script.Parent.ShopUI.AreYouSure.Confirmation.InteractionMenu.ChoiceFrame.Exit.Mo
 	script.Parent.ShopUI.AreYouSure.ThankYou.Visible = false
 	script.Parent.ShopUI.AreYouSure.Owned.Visible = false
 	script.Parent.ShopUI.AreYouSure.MoreEcoPls.Visible = false
+	script.Parent.ShopUI.MainContext.Gear.GearContainer.Visible = true
 end)
 script.Parent.ShopUI.AreYouSure.ThankYou.InteractionMenu.ChoiceFrame.Ok.MouseButton1Click:Connect(function()
 	selectedgear.Value = "None"
@@ -1854,7 +2031,7 @@ script.Parent.ShopUI.AreYouSure.ThankYou.InteractionMenu.ChoiceFrame.Ok.MouseBut
 	script.Parent.ShopUI.AreYouSure.ThankYou.Visible = false
 	script.Parent.ShopUI.AreYouSure.Owned.Visible = false
 	script.Parent.ShopUI.AreYouSure.MoreEcoPls.Visible = false
-
+	script.Parent.ShopUI.MainContext.Gear.GearContainer.Visible = true
 end)
 workspace.World.Objects.Miscellaneous.VentInteractive.MainPro.ProximityPrompt.Triggered:Connect(function(plr)
 	if vent == true then
@@ -1873,6 +2050,7 @@ script.Parent.ShopUI.AreYouSure.Owned.InteractionMenu.ChoiceFrame.Okay.MouseButt
 	script.Parent.ShopUI.AreYouSure.ThankYou.Visible = false
 	script.Parent.ShopUI.AreYouSure.Owned.Visible = false
 	script.Parent.ShopUI.AreYouSure.MoreEcoPls.Visible = false
+	script.Parent.ShopUI.MainContext.Gear.GearContainer.Visible = true
 end)
 script.Parent.ShopUI.AreYouSure.MoreEcoPls.InteractionMenu.ChoiceFrame.Okay.MouseButton1Click:Connect(function()
 	selectedgear.Value = "None"
@@ -1881,6 +2059,7 @@ script.Parent.ShopUI.AreYouSure.MoreEcoPls.InteractionMenu.ChoiceFrame.Okay.Mous
 	script.Parent.ShopUI.AreYouSure.ThankYou.Visible = false
 	script.Parent.ShopUI.AreYouSure.Owned.Visible = false
 	script.Parent.ShopUI.AreYouSure.MoreEcoPls.Visible = false
+	script.Parent.ShopUI.MainContext.Gear.GearContainer.Visible = true
 
 end)
 
@@ -1942,6 +2121,7 @@ end)
 script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Choices.Discon.MouseButton1Click:Connect(function()
 	script.Parent.ShopUI.Preview.Visible = false
 	selectedgear.Value = "None"
+	script.Parent.ShopUI.MainContext.Gear.GearContainer.Visible = true
 end)
 
 script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Choices.Okay.MouseButton1Click:Connect(function()
@@ -1951,33 +2131,35 @@ script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Choices.Okay.MouseButton1Cli
 end)
 
 
-selectedgear.Changed:Connect(function(newtooloption)
+selectedgear.Changed:Connect(function(newtooloption: string)
 	if newtooloption ~= "None" then
-	script.Parent.ShopUI.AreYouSure.ThankYou.InteractionMenu.WhatNeedsToBeCombined.Text = "You have successfully purchased "..tools[newtooloption].Name.."!"
-	script.Parent.ShopUI.AreYouSure.Confirmation.InteractionMenu.Title.Text = "Get "..newtooloption.."?"
-	script.Parent.ShopUI.Preview.Prompt.InteractionMenu.PricePreview.Text = "This item is "..tools[newtooloption].Price.Value.." Eco"
-	script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Title.Text = newtooloption
-	script.Parent.ShopUI.AreYouSure.Confirmation.InteractionMenu.BeWise.Text = "You'll lose " ..tools[newtooloption].Price.Value.." Eco."
-	if newtooloption == "Clipboard" then
-		script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "Take notes without any writing supplies. Don't @ me."
-	elseif newtooloption == "Reactor Tablet" then
-		script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "On the go reactor temperatures."
-	elseif newtooloption == "SpellOfHeat" then
-		script.Parent.SecretMarketUI.MainContext.Gear.ItemDescription.Desc.Text = 'Easily heat up the reactor quickly without the "Direct Heat" nonsense.'
-		script.Parent.SecretMarketUI.AreYouSure.Confirmation.InteractionMenu.Title.Text = "Are you sure you want to buy "..newtooloption.."?"
-		script.Parent.SecretMarketUI.MainContext.Gear.ItemDescription.Price.Text = "This item is "..tools["SpellOfHeat"].Price.Value.." Eco"
-	elseif newtooloption == "Hyperbike" then
-		script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "This hyperbike is futuristic and it's faster than the cars we have!"
-	elseif newtooloption == "Ruby Buddy" then
-		script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "It's a shoulder buddy, but cool. And it's a Rare Ore."
-	elseif newtooloption == "Phantom Buddy" then
-		script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "It's a shoulder buddy, but cooler. And it's an Ultra Rare ore."
-	elseif newtooloption == "Bloxy Cola" then
-		script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "Unlimited refreshers! You'll never lose this, like, ever."
-	elseif newtooloption == "Very Dull Pick" then
-		script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "You must be really daring to own this piece of junk. Maybe you can use it as a sovenuir?"
-	elseif newtooloption == "None" then
-		return "why"
+		script.Parent.ShopUI.MainContext.Gear.GearContainer.Visible = false
+		script.Parent.ShopUI.AreYouSure.ThankYou.InteractionMenu.WhatNeedsToBeCombined.Text = "You have successfully purchased "..tools[newtooloption].Name.."!"
+		script.Parent.ShopUI.AreYouSure.Confirmation.InteractionMenu.Title.Text = "Get "..newtooloption.."?"
+		script.Parent.ShopUI.Preview.Prompt.InteractionMenu.PricePreview.Text = "This item is "..tools[newtooloption].Price.Value.." Eco"
+		script.Parent.ShopUI.AreYouSure.MoreEcoPls.InteractionMenu.WhatNeedsToBeCombined.Text = tostring(tools[newtooloption]).. " costs " ..tools[newtooloption].Price.Value.." Eco, but you have "..player.leaderstats.Eco.Value.." Eco. Save up first!"
+		script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Title.Text = newtooloption
+		script.Parent.ShopUI.AreYouSure.Confirmation.InteractionMenu.BeWise.Text = "You'll lose " ..tools[newtooloption].Price.Value.." Eco."
+		if newtooloption == "Clipboard" then
+			script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "Take notes without any writing supplies. Don't @ me."
+		elseif newtooloption == "Reactor Tablet" then
+			script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "On the go reactor temperatures."
+		elseif newtooloption == "SpellOfHeat" then
+			script.Parent.SecretMarketUI.MainContext.Gear.ItemDescription.Desc.Text = 'Easily heat up the reactor quickly without the "Direct Heat" nonsense.'
+			script.Parent.SecretMarketUI.AreYouSure.Confirmation.InteractionMenu.Title.Text = "Are you sure you want to buy "..newtooloption.."?"
+			script.Parent.SecretMarketUI.MainContext.Gear.ItemDescription.Price.Text = "This item is "..tools["SpellOfHeat"].Price.Value.." Eco"
+		elseif newtooloption == "Hyperbike" then
+			script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "This hyperbike is futuristic and it's faster than the cars we have!"
+		elseif newtooloption == "Ruby Buddy" then
+			script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "It's a shoulder buddy, but cool. And it's a Rare Ore."
+		elseif newtooloption == "Phantom Buddy" then
+			script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "It's a shoulder buddy, but cooler. And it's an Ultra Rare ore."
+		elseif newtooloption == "Bloxy Cola" then
+			script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "Unlimited refreshers! You'll never lose this, like, ever."
+		elseif newtooloption == "Very Dull Pick" then
+			script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "You must be really daring to own this piece of junk. Maybe you can use it as a sovenuir?"
+		elseif newtooloption == "None" then
+			script.Parent.ShopUI.Preview.Prompt.InteractionMenu.Description.Text = "No item selected."
 		end
 	end
 end)
@@ -1987,6 +2169,7 @@ ReplicatedStorage.RemotesEvents.GuiEvents.OtherUiController.OnClientEvent:Connec
 		script.Parent.Parent.Success:Play()
 		script.Parent.ShopUI.AreYouSure.Processsing.Visible = false
 		script.Parent.ShopUI.AreYouSure.ThankYou.Visible = true
+		Process = false
 	elseif which == "Shop" and thank == "Owned" then
 		script.Parent.ShopUI.AreYouSure.Owned.Visible = true
 		script.Parent.ShopUI.AreYouSure.Owned.InteractionMenu.WhatNeedsToBeCombined.Text = "You already own this item."
@@ -2016,6 +2199,7 @@ ReplicatedStorage.RemotesEvents.GuiEvents.OtherUiController.OnClientEvent:Connec
 		script.Parent.ShopUI.AreYouSure.Processsing.Visible = false
 		script.Parent.Parent.Error:Play()
 		script.Parent.ShopUI.AreYouSure.MoreEcoPls.Visible = true
+
 	end
 	if which == "Cave" and "Iron" then
 		script.Parent.CaveUIResearchUI.MustHaveIron.Visible = true
@@ -2024,11 +2208,27 @@ ReplicatedStorage.RemotesEvents.GuiEvents.OtherUiController.OnClientEvent:Connec
 	end
 end)
 
+script.Parent.SellOres.AreYouSure.UnableToDo.InteractionMenu.ChoiceFrame.Okay.MouseButton1Click:Connect(function()
+	selectedgear.Value = "None"
+	script.Parent.ShopUI.AreYouSure.Visible = false
+	script.Parent.ShopUI.AreYouSure.Confirmation.Visible = false
+	script.Parent.ShopUI.AreYouSure.ThankYou.Visible = false
+	script.Parent.ShopUI.AreYouSure.Owned.Visible = false
+	script.Parent.ShopUI.AreYouSure.UnableToDo.Visible = false
+	script.Parent.ShopUI.AreYouSure.MoreEcoPls.Visible = false
+	script.Parent.ShopUI.MainContext.Gear.GearContainer.Visible = true
+end)
+
 ReplicatedStorage.RemotesEvents.GameEvents.PaycheckReminder.OnClientEvent:Connect(function(eco,xp)
 	script.Parent.Parent.Hooray:Play()
 	script.Parent.Paycheck.Visible = true
-	script.Parent.Paycheck.Paycheck.Frame.RewardEco.Text = eco.." Eco"
-	script.Parent.Paycheck.Paycheck.Frame.RewardXp.Text = xp.." XP"
+	if (MarketplaceService:UserOwnsGamePassAsync(player.UserId, id2)) or (MarketplaceService:UserOwnsGamePassAsync(player.UserId, id)) then
+		script.Parent.Paycheck.Paycheck.Frame.RewardEco.Text = 2*eco.." Eco"
+		script.Parent.Paycheck.Paycheck.Frame.RewardXp.Text = 2*xp.." XP"
+	else
+		script.Parent.Paycheck.Paycheck.Frame.RewardEco.Text = eco.." Eco"
+		script.Parent.Paycheck.Paycheck.Frame.RewardXp.Text = xp.." XP"
+	end
 	task.wait(5)
 	script.Parent.Paycheck.Visible = false
 end)
@@ -2065,9 +2265,11 @@ ReplicatedStorage.Events.EndingEvent.OnClientEvent:Connect(function(endingtype)
 		if workspace.GameData.EcoCC.ReactorStats.ShutD.Value == false then
 			player.PlayerScripts.Cutscenes.Ending.Disabled = false
 		end
+		return "normal"
 	elseif endingtype == "Overload" then
 		return "ok"
 	end
+	return "irregular"
 end)
 
 workspace.World.Objects.Characters.Gello.Head.Dialog.DialogChoiceSelected:Connect(function(player,choice)
@@ -2094,20 +2296,19 @@ script.Parent.YourLevel.MainContext.Tips.BackLevelUpTips.MouseButton1Click:Conne
 	script.Parent.YourLevel.MainContext.Tips.Visible = false
 end)
 
-script.Parent.YourLevel.ActionBar.TextButton.MouseButton1Click:Connect(function()
+
+script.Parent.NoReverbPass.Prompt.InteractionMenu.Choices.Okay.MouseButton1Click:Connect(function()
 	script.Parent.Parent.Click:Play()
-	script.Parent.YourLevel.Visible = false
+	script.Parent.NoReverbPass.Visible = false
 end)
 
-script.Parent.Level.MouseButton1Click:Connect(function()
-	script.Parent.Parent.Click:Play()
-	script.Parent.YourLevel.Visible = true
-end)
 
-ReplicatedStorage.Events.CustomHDAdminHandler.OnClientEvent:Connect(function(ui,cmd)
+
+
+ReplicatedStorage.Events.CustomHDAdminHandler.OnClientEvent:Connect(function(ui,cmd: string)
 	if ui == "CommandProhibit" and cmd then
 		script.Parent.CommandProhibited.Visible = true
-		script.Parent.CommandProhibited.Prompt.InteractionMenu.WhatNeedsToBeCombined.Text = cmd.." is prohibited due to interference with public server gameplay."
+		script.Parent.CommandProhibited.Prompt.InteractionMenu.WhatNeedsToBeCombined.Text = cmd.." is prohibited due to interference with the game server."
 	elseif ui == "CommandWarn" and cmd then
 		script.Parent.CommandWarning.Visible = true
 		script.Parent.CommandWarning.Prompt.InteractionMenu.WhatNeedsToBeCombined.Text = "Using "..cmd.." will heavily affect your gameplay in this server."
@@ -2117,6 +2318,14 @@ end)
 script.Parent.FeatureUpdate.Prompt.Exit.MouseButton1Click:Connect(function()
 	script.Parent.FeatureUpdate.Visible = false
 	uiClose()
+	--if script.Parent.FeatureUpdateVal.Value == true then
+	--	script.Parent.Menu:TweenPosition(UDim2.new(0.007, 0, 0.399, 0))
+	--	menu = true
+	--	script.Parent.ShareData.Visible = true
+	--	task.wait(1)
+	--	script.Parent.ShareData.Options.Visible = true
+	--	script.Parent.FeatureUpdateVal.Value = false
+	--end
 	if script.Parent.Parent:FindFirstChild("Intro") then
 		if script.Parent.Parent.Intro:FindFirstChild("Main") then
 			if script.Parent.Parent.Intro.Main.Disabled == false then
@@ -2125,6 +2334,67 @@ script.Parent.FeatureUpdate.Prompt.Exit.MouseButton1Click:Connect(function()
 		end
 	end
 end)
+
+
+
+script.Parent.ShareData.Options.Share.MouseButton1Click:Connect(function()
+	game.Lighting.uiBlur.Size = 0
+	script.Parent.Settings.MainContext.Privacy.ShareDataOn.BackgroundColor3 = buttoncolors.enabled
+	script.Parent.Settings.MainContext.Privacy.ShareDataOff.BackgroundColor3 = buttoncolors.disabled
+	game.ReplicatedStorage.Events.PrivacyEvent:FireServer("ShareData",true)
+	script.Parent.ShareData.Visible = false
+end)
+
+script.Parent.ShareData.Options.Deny.MouseButton1Click:Connect(function()
+	game.Lighting.uiBlur.Size = 0
+	game.ReplicatedStorage.Events.PrivacyEvent:FireServer("ShareData",false)
+	script.Parent.ShareData.Visible = false
+end)
+
+
+
+script.Parent.Settings.MainContext.Privacy.ShareDataOn.MouseButton1Click:Connect(function()
+	game.ReplicatedStorage.Events.PrivacyEvent:FireServer("ShareData",true)
+	script.Parent.Settings.MainContext.Privacy.ShareDataOn.BackgroundColor3 = buttoncolors.enabled
+	script.Parent.Settings.MainContext.Privacy.ShareDataOff.BackgroundColor3 = buttoncolors.disabled
+end)
+
+script.Parent.Settings.MainContext.Privacy.ShareDataOff.MouseButton1Click:Connect(function()
+	game.ReplicatedStorage.Events.PrivacyEvent:FireServer("ShareData",false)
+	script.Parent.Settings.MainContext.Privacy.ShareDataOn.BackgroundColor3 = buttoncolors.disabled
+	script.Parent.Settings.MainContext.Privacy.ShareDataOff.BackgroundColor3 = buttoncolors.enabled
+end)
+
+--
+
+script.Parent.Settings.MainContext.Privacy.FeedbackUserDataOn.MouseButton1Click:Connect(function()
+	game.ReplicatedStorage.Events.PrivacyEvent:FireServer("ShareFeedbackData",true)
+	script.Parent.Settings.MainContext.Privacy.FeedbackUserDataOn.BackgroundColor3 = buttoncolors.enabled
+	script.Parent.Settings.MainContext.Privacy.FeedbackUserDataOff.BackgroundColor3 = buttoncolors.disabled
+end)
+
+script.Parent.Settings.MainContext.Privacy.FeedbackUserDataOff.MouseButton1Click:Connect(function()
+	game.ReplicatedStorage.Events.PrivacyEvent:FireServer("ShareFeedbackData",false)
+	script.Parent.Settings.MainContext.Privacy.FeedbackUserDataOn.BackgroundColor3 = buttoncolors.disabled
+	script.Parent.Settings.MainContext.Privacy.FeedbackUserDataOff.BackgroundColor3 = buttoncolors.enabled
+end)
+
+--
+
+script.Parent.Settings.MainContext.Privacy.ShareAdditionalDataOn.MouseButton1Click:Connect(function()
+	game.ReplicatedStorage.Events.PrivacyEvent:FireServer("ShareAdditionalData",true)
+	script.Parent.Settings.MainContext.Privacy.ShareAdditionalDataOn.BackgroundColor3 = buttoncolors.enabled
+	script.Parent.Settings.MainContext.Privacy.ShareAdditionalDataOff.BackgroundColor3 = buttoncolors.disabled
+end)
+
+script.Parent.Settings.MainContext.Privacy.ShareAdditionalDataOff.MouseButton1Click:Connect(function()
+	game.ReplicatedStorage.Events.PrivacyEvent:FireServer("ShareAdditionalData",false)
+	script.Parent.Settings.MainContext.Privacy.ShareAdditionalDataOn.BackgroundColor3 = buttoncolors.disabled
+	script.Parent.Settings.MainContext.Privacy.ShareAdditionalDataOff.BackgroundColor3 = buttoncolors.enabled
+end)
+
+--
+
 
 script.Parent.Settings.MainContext.Others.FeatureLogToggle.MouseButton1Click:Connect(function()
 	script.Parent.FeatureUpdate.Visible = true
@@ -2179,6 +2449,15 @@ ReplicatedStorage.RemotesEvents.GameEvents.Nuclear.OverloadMeltdownEnding.OnClie
 	task.wait(0.2)
 	script.Parent.OvrldEnding.Text = "?d,/"
 	task.wait(0.2)
+	script.Parent.OvrldEnding.Text = "thI m?!it"
+	task.wait(0.2)
+	script.Parent.OvrldEnding.Text = "thI m?!it"
+	task.wait(0.2)
+	script.Parent.OvrldEnding.Text = "thI m?!it"
+	task.wait(0.2)
+	script.Parent.OvrldEnding.Text = "thI m?!it"
+	task.wait(0.2)
+	task.wait(0.2)
 	script.Parent.Parent.LocalMusic.OverloadEnding.Sound3:Stop()
 	task.wait(0.5)
 	script.Parent.Parent.LocalMusic.OverloadEnding.Sound4:Stop()
@@ -2189,10 +2468,10 @@ ReplicatedStorage.RemotesEvents.GameEvents.Nuclear.OverloadMeltdownEnding.OnClie
 end)
 
 script.Parent.MusicPlayer.PlayerUi.AdminUI.AdMarket.MouseButton1Click:Connect(function()
-	player.PlayerScripts.Advertiseement.Disabled = false
+	player.PlayerScripts.Cutscenes.Advertiseement.Disabled = false
 	script.Parent.MusicPlayer.Visible = false
 	script.Parent.Parent.CoreGUI.Enabled = false
-	task.wait(190)
+	task.wait(210)
 	script.Parent.MusicPlayer.Visible = true
 	script.Parent.Parent.CoreGUI.Enabled = true
 end)
@@ -2247,9 +2526,7 @@ script.Parent.Tutorial.Welcome.Exit.MouseButton1Click:Connect(function()
 	uiClose()
 end)
 
-script.Parent.QuestsButton.MouseButton1Click:Connect(function()
-	script.Parent.Quests.Visible = true
-end)
+
 
 script.Parent.Tutorial.Caves.Exit.MouseButton1Click:Connect(function()
 	script.Parent.Tutorial.Caves.Visible = false
@@ -2285,9 +2562,6 @@ script.Parent.NoHazmat.HazmatAdvise.InteractionMenu.ExitFrame.Ok.MouseButton1Cli
 	script.Parent.NoHazmat.Visible = false
 end)
 
-script.Parent.Replies.InteractionMenu.RepliesFrame.Reply.Delete.MouseButton1Click:Connect(function()
-	ReplicatedStorage.FeedbackDeleteEvent:FireServer(true)
-end)
 
 script.Parent.SecretMarketUI.MainContext.Gear.ItemDescription.Buy.MouseButton1Click:Connect(function()
 	if selectedgear.Value ~= "None" then
@@ -2397,6 +2671,31 @@ end)
 
 updateonjoin()
 
+if player:FindFirstChild("Backpack") ~= nil then
+	player.Backpack.Changed:Connect(function()
+		local Tool = player.Backpack:FindFirstChild("Kangaroo") or player.Character:FindFirstChild("Kangaroo")
+		if Tool then
+			script.Parent.WhichSpell.InteractionMenu.SpellList.Kangaroo.Visible = true
+		else
+			script.Parent.WhichSpell.InteractionMenu.SpellList.Kangaroo.Visible = false
+		end
+
+		local Tool2 = player.Backpack:FindFirstChild("Swiftness") or player.Character:FindFirstChild("Swiftness")
+		if Tool2 then
+			script.Parent.WhichSpell.InteractionMenu.SpellList.Swiftness.Visible = true
+		else
+			script.Parent.WhichSpell.InteractionMenu.SpellList.Swiftness.Visible = false
+		end
+
+		local Tool3 = player.Backpack:FindFirstChild("SpellOfHeat") or player.Character:FindFirstChild("SpellOfHeat")
+		if Tool3 then
+			script.Parent.WhichSpell.InteractionMenu.SpellList.SpellOfHeat.Visible = true
+		else
+			script.Parent.WhichSpell.InteractionMenu.SpellList.SpellOfHeat.Visible = false
+		end
+	end)
+end
+
 workspace:WaitForChild("ShopProx2",9).ProximityPrompt.Triggered:Connect(function()
 	uiOpen()
 	script.Parent.SellOres.Visible = true
@@ -2406,3 +2705,39 @@ workspace:WaitForChild("ShopProx3",9).ProximityPrompt.Triggered:Connect(function
 	uiOpen()
 	script.Parent.SellOres.Visible = true
 end)
+
+local Process = false
+
+script.Parent.ShopUI.AreYouSure.Processsing:GetPropertyChangedSignal("Visible"):Connect(function(property)
+	if property == true and Process == false then
+		Process = true
+		task.wait(16)
+		if Process == true then
+			script.Parent.SellOres.AreYouSure.Processsing.Visible = false		
+			script.Parent.SellOres.AreYouSure.UnableToDo.Visible = true	
+			Process = false
+		end
+	elseif property == false then
+		Process = false
+	end
+end)
+
+if player.Privacy["ShareData"].Value == true then
+	script.Parent.Settings.MainContext.Privacy.ShareDataOn.BackgroundColor3 = buttoncolors.enabled
+	script.Parent.Settings.MainContext.Privacy.ShareDataOff.BackgroundColor3 = buttoncolors.disabled
+elseif player.Privacy["ShareData"].Value == false then
+	script.Parent.Settings.MainContext.Privacy.ShareDataOn.BackgroundColor3 = buttoncolors.disabled
+	script.Parent.Settings.MainContext.Privacy.ShareDataOff.BackgroundColor3 = buttoncolors.enabled
+elseif player.Privacy["ShareFeedbackData"].Value == true then
+	script.Parent.Settings.MainContext.Privacy.FeedbackUserDataOn.BackgroundColor3 = buttoncolors.enabled
+	script.Parent.Settings.MainContext.Privacy.FeedbackUserDataOff.BackgroundColor3 = buttoncolors.disabled
+elseif player.Privacy["ShareFeedbackData"].Value == false then
+	script.Parent.Settings.MainContext.Privacy.FeedbackUserDataOn.BackgroundColor3 = buttoncolors.disabled
+	script.Parent.Settings.MainContext.Privacy.FeedbackUserDataOff.BackgroundColor3 = buttoncolors.enabled
+elseif player.Privacy["AdditionalData"].Value == true then
+	script.Parent.Settings.MainContext.Privacy.ShareAdditionalDataOn.BackgroundColor3 = buttoncolors.enabled
+	script.Parent.Settings.MainContext.Privacy.ShareAdditionalDataOff.BackgroundColor3 = buttoncolors.disabled
+elseif player.Privacy["AdditionalData"].Value == false then
+	script.Parent.Settings.MainContext.Privacy.ShareAdditionalDataOn.BackgroundColor3 = buttoncolors.disabled
+	script.Parent.Settings.MainContext.Privacy.ShareAdditionalDataOff.BackgroundColor3 = buttoncolors.enabled
+end

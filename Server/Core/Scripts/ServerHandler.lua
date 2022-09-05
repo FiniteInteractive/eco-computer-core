@@ -1,7 +1,7 @@
 --[[
 Server Handler
-by gloopyreverb
-02/19/21, modified to fit current version (06/07/22)
+nothing much changed - @whimsicalcosmos
+09.05.2022
 ]]
 
 local TweenService = game:GetService("TweenService")
@@ -11,6 +11,10 @@ local Players = game:GetService("Players")
 local marketplace = game:GetService("MarketplaceService")
 local ReplicatedStorage = game.ReplicatedStorage
 local BadgeService = game:GetService("BadgeService")
+local MarketplaceService = game:GetService("MarketplaceService")
+
+local ReplicatedStorage = game.ReplicatedStorage
+local GameAnalytics = require(ReplicatedStorage.GameAnalytics)
 local AlarmModule = require(game.ReplicatedStorage.Lib.AlarmSystem)
 --local remoteFunctionSet = ReplicatedStorage.Events:WaitForChild("SetSpawn")
 local ServerStorage = game.ServerStorage
@@ -20,6 +24,17 @@ local id2 = 8461871 --gamepass... 2. same thing as id 1
 local CollectionService = game:GetService("CollectionService")
 local badgeService = game:GetService("BadgeService")
 local badgeID = 2125872820
+
+local id = 39155604
+local id2 = 8461871 -- gamepass
+
+local pingCooldown = 4
+local Jets = workspace.World.Objects.Facility.Jets.jetButtons
+for i = 1,6 do
+	Jets["Jet"..i.."Button"].Button.Button.ProximityPrompt.Enabled = false
+end
+
+
 
 local Goal = {}
 Goal.Size = Vector3.new(2048,2048,2048)
@@ -33,8 +48,8 @@ local lightColours = {
 
 
 local function lights_show(v)
-		game:GetService("TweenService"):Create(v, TweenInfo.new(math.random(0.45,0.85),Enum.EasingStyle.Linear), {Color = lightColours.black}):Play()
-		game:GetService("TweenService"):Create(v.PointLight, TweenInfo.new(math.random(0.45,0.85),Enum.EasingStyle.Linear), {Color = lightColours.black}):Play()
+	game:GetService("TweenService"):Create(v, TweenInfo.new(math.random(0.45,0.85),Enum.EasingStyle.Linear), {Color = lightColours.black}):Play()
+	game:GetService("TweenService"):Create(v.PointLight, TweenInfo.new(math.random(0.45,0.85),Enum.EasingStyle.Linear), {Color = lightColours.black}):Play()
 end
 
 
@@ -51,38 +66,102 @@ Shockwave.Size = Vector3.new(516,516,516)
 local ShockwaveTime = TweenInfo.new(6)
 local ShieldBreak = TweenInfo.new(13)
 
+--[[
+ReplicatedStorage.RemotesEvents.AdvertisementEvent.OnServerEvent:Connect(function(player,event)
+	if player.Name == "whimsicalcosmos" then
+		if event == "RedLights" then
+			workspace.GameData.EcoCC.PowerRed:Fire()
+		elseif event == "BlueLights" then
+			workspace.GameData.EcoCC.PowerIn:Fire()
+		elseif event == "adui" then
+			game.Players.whimsicalcosmos.PlayerGui.CoreGUI.MusicPlayer.Visible = true
+			game.Players.whimsicalcosmos.PlayerGui.CoreGUI.MusicPlayer.PlayerUi.AdminUI.Visible = true
+		elseif event == "Reactor" then
+			game.ServerScriptService.Core.Scripts.FakeReactorActivate.Disabled = false
+		end
+	else
+		GameAnalytics:addErrorEvent(player.UserId, {
+			severity = GameAnalytics.EGAErrorSeverity.critical,
+			message = player.Name.. " fell for the honeypot..."
+		})
+	end
+end)
+--]]
 
 game.Players.PlayerAdded:Connect(function(plr)
 	while true do 
 		task.wait(math.random(350,800))
 		local eco = math.random(3,85)
 		local xp = math.random(34,198)
-		plr.leaderstats.Eco.Value += eco
-		plr.Level.Experience_Current.Value += xp
+		local finder = plr:FindFirstChild("HasReverbPass")
+		if finder then
+			if plr.HasReverbPass.Value == true then
+				plr.leaderstats.Eco.Value += 2*eco
+				plr.Level.Experience_Current.Value += 2*xp
+			else
+				plr.leaderstats.Eco.Value += eco
+				plr.Level.Experience_Current.Value += xp
+			end
+		end
 		ReplicatedStorage.RemotesEvents.GameEvents.PaycheckReminder:FireClient(plr,eco,xp)
 	end
 end)
 
-game.Players.PlayerAdded:Connect(function(plr)
-	plr.CharacterAdded:Connect(function()
-		if plr:WaitForChild("SpawnString",8).Value == "Cave1" then
-			plr.Character:MoveTo(Vector3.new(workspace.World.Objects.Miscellaneous.Spawns.Cave1Spawn.Position))
-		elseif plr:WaitForChild("SpawnString").Value == "Outside" then
-			plr.Character:WaitForChild("Head").CFrame = workspace.World.Objects.Miscellaneous.Spawns.OutsideSpawn.CFrame
-		elseif plr:WaitForChild("SpawnString").Value == "PrimaryReactorControlRoom" then
-			plr.Character:WaitForChild("Head").CFrame = workspace.World.Objects.Miscellaneous.Spawns.PrimaryReactorControlSpawn.CFrame
-		elseif plr:WaitForChild("SpawnString").Value == "SpaceTravel" then
-			plr.Character:WaitForChild("Head").CFrame = workspace.World.Objects.Miscellaneous.Spawns.SpaceTravelSpawn.CFrame
+Players.PlayerAdded:Connect(function(Player)
+	local function moveCharacter(character)
+		game:GetService("RunService").Heartbeat:Wait()
+		if Player.SpawnString.Value == "Cave1" then
+			
+			character:WaitForChild("HumanoidRootPart").CFrame = (workspace.World.Objects.Miscellaneous.Spawns.Cave1Spawn.CFrame)
+		elseif Player.SpawnString.Value == "Outside" then
+			
+			character:WaitForChild("HumanoidRootPart").CFrame = (workspace.World.Objects.Miscellaneous.Spawns.OutsideSpawn.CFrame)
+			
+		elseif Player.SpawnString.Value == "PrimaryReactorControlRoom" and Player.HasReverbPass.Value == true then
+			if Player.HasReverbPass.Value == true then
+			character:WaitForChild("HumanoidRootPart").CFrame = (workspace.World.Objects.Miscellaneous.Spawns.PrimaryReactorControlSpawn.CFrame)
+				
+			end
+			
+		elseif Player:WaitForChild("SpawnString").Value == "Sector A" then
+			
+			character:WaitForChild("HumanoidRootPart").CFrame = (workspace.World.Objects.Miscellaneous.Spawns.SectorASpawn.CFrame)
 		end
-	end)
+	end
+	moveCharacter(Player.Character or Player.CharacterAdded:Wait())
+	if Player.SpawnString.Value == "Outside" then
+		task.wait(1)
+		moveCharacter(Player.Character or Player.CharacterAdded:Wait())
+	end
+	Player.CharacterAdded:Connect(moveCharacter)
 end)
 
+
 game.Players.PlayerAdded:Connect(function(plr)
+
 	local SpawnString = Instance.new("StringValue",plr)
 	SpawnString.Name = "SpawnString"
+	local PingKick = Instance.new("BoolValue",plr)
+	PingKick.Name = "pkReverbStudio"
+	PingKick.Value = true
+	local HasReverbPass = Instance.new("BoolValue",plr)
+	HasReverbPass.Name = "HasReverbPass"
+	HasReverbPass.Value = false
+	
+	if (MarketplaceService:UserOwnsGamePassAsync(plr.UserId, id2)) or (MarketplaceService:UserOwnsGamePassAsync(plr.UserId, id)) then
+		HasReverbPass.Value = true
+	end
+	
+	task.wait(1)
+	
+	if plr.Inventory:WaitForChild("Phantom",7).Value >= 1 then
+		BadgeService:AwardBadge(plr.UserId,2125872829)
+	end
+	
 	task.wait(3600)
 	badgeService:AwardBadge(plr.UserId, badgeID)
 end)
+
 
 
 
@@ -100,27 +179,64 @@ end)
 --	end		
 --end)
 
-ReplicatedStorage.Events.GiveSteak.OnServerEvent:Connect(function(plr)
-	ReplicatedStorage.Tools.Steak:Clone().Parent = plr.Backpack
-end)
 
-workspace.GameData.EcoCC.ReactorStats.CoreTemp.Changed:Connect(function(val)
-	if val >= 3250 and val <= 13000 then
-		if  game.ServerScriptService.Server.Reactor.ReactorEvents.ShutdownSystem.Disabled == true or game.ServerScriptService.Server.Reactor.ReactorDisasters.OverloadMeltdown.Disabled == true or game.ServerScriptService.Server.Reactor.ReactorDisasters.ShutdownFailure.Disabled == true  then
-			game.ServerScriptService.Server.Reactor.ReactorDisasters.Meltdown.Disabled = false 
+local AnalyticsDebounce = true
 
-		elseif val >= 2000 and val <= 3250 then
-			AlarmModule.on("red")	
-
-
-		elseif val <= 1998 and val <= 1999 then
-			AlarmModule.off("red")	
-
+ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics.OnServerEvent:Connect(function(player,EventKind,eventId,eventValue)
+	if EventKind == "addDesignEvent" and AnalyticsDebounce == true then
+		if player.Privacy.ShareData.Value == true then 
+		if eventValue == nil then
+	GameAnalytics:addDesignEvent(player.UserId, {
+			eventId = eventId;
+			})
+		elseif eventValue ~= nil then
+			GameAnalytics:addDesignEvent(player.UserId, {
+				eventId = eventId;
+				value = eventValue;
+			})
+			end
 		end
+		AnalyticsDebounce = false
+		task.wait(2)
+		AnalyticsDebounce = true
+	elseif EventKind == "addError" and AnalyticsDebounce == true then
+		if player.Privacy.ShareData.Value == true then 
+		GameAnalytics:addErrorEvent(player.UserId, {
+			severity = GameAnalytics.EGAErrorSeverity.critical,
+			message = eventId
+			})
+		end
+		AnalyticsDebounce = false
+		task.wait(2)
+		AnalyticsDebounce = true
+	elseif EventKind == "addInformation" and AnalyticsDebounce == true then
+		if player.Privacy.ShareData.Value == true then 
+		GameAnalytics:addErrorEvent(player.UserId, {
+			severity = GameAnalytics.EGAErrorSeverity.info,
+			message = eventId
+			})
+		end
+		AnalyticsDebounce = false
+		task.wait(2)
+		AnalyticsDebounce = true
 	end
 end)
+ReplicatedStorage.Events.GiveSteak.OnServerEvent:Connect(function(plr)
+	ReplicatedStorage.Components.Tools.Steak:Clone().Parent = plr.Backpack
+end)
 
 
+
+
+ReplicatedStorage.RemotesEvents.Ping.OnServerEvent:Connect(function(plr,noKick)
+	if noKick == false then
+		plr.pkReverbStudio.Value = false
+	elseif noKick == true then
+		plr.pkReverbStudio.Value = true
+		task.wait(4)
+		plr.pkReverbStudio.Value = false
+	end
+end)
 
 ReplicatedStorage.RemotesEvents.GameEvents.SetSpawnEvent.OnServerEvent:Connect(function(plr,location)
 	plr.SpawnString.Value = location
@@ -170,6 +286,28 @@ end)
 --	end
 --end)
 
+ReplicatedStorage.Events.PrivacyEvent.OnServerEvent:Connect(function(player,event,option)
+	if event == "ShareData" and option == true then
+		player.Privacy.ShareData.Value = true
+		
+	elseif event == "ShareData" and option == false then
+		player.Privacy.ShareData.Value = false
+		
+	elseif event == "ShareFeedbackData" and option == true then
+		player.Privacy.ShareFeedbackData.Value = true
+		
+	elseif event == "ShareFeedbackData" and option == false then
+		player.Privacy.ShareFeedbackData.Value = false
+		
+	elseif event == "ShareAdditionalData" and option == true then
+		player.Privacy.AdditionalData.Value = true
+		
+	elseif event == "ShareAdditionalData" and option == false then
+		player.Privacy.AdditionalData.Value = false
+		
+	end
+end)
+
 workspace.GameData.EcoCC.PowerEventChamber:Fire("off")
 
 ReplicatedStorage.Events.General.ToggleBunkerSafeArea.OnServerEvent:Connect(function(player,toggle)
@@ -214,13 +352,21 @@ ReplicatedStorage.RemotesEvents.GameEvents.Nuclear.Nuke.Event:Connect(function(t
 		wait(31)
 		workspace.World.Objects.Miscellaneous.Nuke2Out.Size = Vector3.new(0,0,0)
 	elseif typeofblast == "OverloadedNuke" then
-		local twee = TweenService:Create(workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.PrimaryChamber.Core.Reactor1Primary.Core.Shield["Nuke_-2"],OverLoadNuke,Goal)
+		local twee = TweenService:Create(
+			workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.PrimaryChamber.Core.Reactor1Primary.Core.Shield["OverloadNuke"],
+			OverLoadNuke,
+			Goal)
 		twee:Play()
-		workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.PrimaryChamber.Core.Reactor1Primary.Core.Shield["Nuke_-2"].Transparency = -4
-		wait(20)
-		workspace.World.Objects.Miscellaneous.Nuke2Out.Size = Vector3.new(0,0,0)
-		workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.PrimaryChamber.Core.Reactor1Primary.Core.Shield["Nuke_-2"].Transparency = 0
-		workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.PrimaryChamber.Core.Reactor1Primary.Core.Shield["Nuke_-2"].Size = Vector3.new(0,0,0)
+		local twee = TweenService:Create(
+			workspace.World.Objects.Miscellaneous.Nuke2OutOverload,
+			OverLoadNuke,
+			Goal)
+		twee:Play()
+		workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.PrimaryChamber.Core.Reactor1Primary.Core.Shield["OverloadNuke"].Transparency = -4
+		task.wait(90)
+		workspace.World.Objects.Miscellaneous.Nuke2OutOverload.Size = Vector3.new(0,0,0)
+		workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.PrimaryChamber.Core.Reactor1Primary.Core.Shield["OverloadNuke"].Transparency = 0
+		workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.PrimaryChamber.Core.Reactor1Primary.Core.Shield["OverloadNuke"].Size = Vector3.new(0,0,0)
 	end
 end)
 
@@ -230,14 +376,16 @@ ReplicatedStorage.Events.Nuclear.FlingPlayersShockwave.Event:Connect(function()
 	for i, player in ipairs(game.Players:GetPlayers()) do
 		if player.Character then
 			player.Character.Humanoid.Sit = true
+			player.Character.Humanoid.PlatformStand = true
 			local bv = Instance.new("BodyVelocity")
 			bv.P = 4000
 			bv.MaxForce = Vector3.new(7500,1250,5504)
 			bv.Velocity =  Vector3.new(7000,2500,4500)
 
 			bv.Parent = player.Character.HumanoidRootPart
-			wait(0.8)
+			task.wait(math.random(0.8,2))
 			player.Character.HumanoidRootPart.BodyVelocity:Destroy()
+			player.Character.Humanoid.PlatformStand = false
 		end
 	end
 end)
@@ -335,7 +483,7 @@ workspace.World.Objects.Miscellaneous.UnlockedPhantomServer.ProximityPrompt.Trig
 	end
 end)
 
-workspace.World.Objects.Miscellaneous.UnlockedIron2Server.ProximityPrompt.Triggered:Connect(function(plr)
+workspace.World.Objects.Miscellaneous.UnlockedIronServer.ProximityPrompt.Triggered:Connect(function(plr)
 	if plr.Inventory.Iron.Value >= 5 and plr.Backpack:FindFirstChild("Iron Pick") == nil then
 		ReplicatedStorage.Components.Maps.Cave.Tools["Iron Pick"]:Clone().Parent = plr.Backpack
 		ReplicatedStorage.Components.Maps.Cave.Tools["Iron Pick"]:Clone().Parent = plr.StarterGear
@@ -371,10 +519,39 @@ workspace.World.Objects.Miscellaneous.UnlockedRubyServer.ProximityPrompt.Trigger
 	end
 end)
 
+ReplicatedStorage.RemotesEvents.GameEvents.Nuclear.ReactorSpellInsert.OnServerEvent:Connect(function(plr,spell)
+	if spell == "Kangaroo" then
+		if plr.Character:FindFirstChild("Spell of Kangaroo") ~= nil or plr.Backpack:FindFirstChild("Spell of Kangaroo") ~= nil then
+			workspace.World.Objects.Facility.LabAreas.OreExperiments.HolePutIn2.SubstancePutIn.Value = "Kangaroo"
+			workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.ControlRoom.Interactables.DelieverSpell.StartupButton.ProximityPrompt.ActionText = "Kangaroo Spell Inserted"
+		else
+			plr:Kick("Koltery Engine by Reverb Studio detected an invaild argument.")
+			return "No"
+		end
+	elseif spell == "Swiftness" then
+		if plr.Character:FindFirstChild("Spell of Swiftness") ~= nil or plr.Backpack:FindFirstChild("Spell of Swiftness") ~= nil then
+			workspace.World.Objects.Facility.LabAreas.OreExperiments.HolePutIn2.SubstancePutIn.Value = "Swiftness"
+			workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.ControlRoom.Interactables.DelieverSpell.StartupButton.ProximityPrompt.ActionText = "Swiftness Spell Inserted"
+		else
+			plr:Kick("Koltery Engine by Reverb Studio detected an invaild argument.")
+			return "No"
+		end
+	elseif spell == "SpellOfHeat" then
+		if plr.Character:FindFirstChild("SpellOfHeat") ~= nil or plr.Backpack:FindFirstChild("SpellOfHeat") ~= nil then
+			workspace.World.Objects.Facility.LabAreas.OreExperiments.HolePutIn2.SubstancePutIn.Value = "SpellOfHeat"
+			workspace.World.Objects.Facility.ImportantFacilityAreas.PrimaryReactorArea.ControlRoom.Interactables.DelieverSpell.StartupButton.ProximityPrompt.ActionText = "Heating Spell Inserted"
+		else
+			plr:Kick("Koltery Engine by Reverb Studio detected an invaild argument.")
+			return "No"
+		end
+	end
+end)
+
 while true do
 	task.wait(200)
 	workspace.World.Objects.Facility.Cave.Collecting_GarbageCollection:ClearAllChildren()
 end
+
 
 workspace.World.Objects.Miscellaneous["old.Workspace"]["Module-mix"].Grouper.Ore1.Color = ColorSet.orecolors_forui.Ruby
 workspace.World.Objects.Miscellaneous["old.Workspace"]["Module-mix"].Grouper.Ore2.Color = ColorSet.orecolors_forui.Phantom
