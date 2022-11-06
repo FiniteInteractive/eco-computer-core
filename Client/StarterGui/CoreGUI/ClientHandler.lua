@@ -1232,7 +1232,7 @@ script.Parent.Menu.About.MouseButton1Click:Connect(function()
 	script.Parent.About:TweenPosition(UDim2.new(0.292, 0,0.433, 0),"Out","Quad",0.28)
 end)
 
-script.Parent.About.InteractionMenu.Exit.MouseButton1Click:Connect(function()
+script.Parent.About.Exit.MouseButton1Click:Connect(function()
 	tweeny(script.Parent.About,1)
 	uiClose()
 	script.Parent.About:TweenPosition(UDim2.new(0.292, 0,0.444, 0),"Out","Quad",0.28)
@@ -1511,12 +1511,12 @@ if level_notload == false then
 	end)
 end
 
-script.Parent.Donate.InteractionMenu.DonateButtons["10Robux"].MouseButton1Click:Connect(function()
+script.Parent.Donate.InteractionMenu.DonateButtons_Row1["10Robux"].MouseButton1Click:Connect(function()
 	ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addInformation","Player donating")
 	game:GetService("MarketplaceService"):PromptProductPurchase(player,1256027063)
 
 end)
-script.Parent.Donate.InteractionMenu.DonateButtons["100Robux"].MouseButton1Click:Connect(function()
+script.Parent.Donate.InteractionMenu.DonateButtons_Row1["100Robux"].MouseButton1Click:Connect(function()
 	ReplicatedStorage.RemotesEvents.PowerExternal.GameAnalytics:FireServer("addInformation","Player donating")
 	game:GetService("MarketplaceService"):PromptProductPurchase(player,1256027086)
 
